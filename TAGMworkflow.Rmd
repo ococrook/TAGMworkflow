@@ -1,7 +1,7 @@
 ---
 title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
 author:
-- name: Oliver Crook
+- name: Oliver M. Crook
 - name: Laurent Gatto
 package: pRoloc
 output:
@@ -16,6 +16,48 @@ output:
   **Bioconductor version**: `r BiocManager::version()`
 
 # Introduction
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+require(pRoloc)
+require(coda)
+setStockcol(NULL)
+setStockcol(paste0(getStockcol(), 90))
+
+
+# Helper function to get number of outlier at each iteration of MCMC
+mcmc_get_outliers <- function(x) {
+    stopifnot(inherits(x, "MCMCParams"))
+    lapply(x@chains@chains, function(mc) coda::mcmc(colSums(1 - mc@Outlier)))
+}
+
+# Helper function to get mean component allocation at each iteration of MCMC
+
+mcmc_get_meanComponent <- function(x) {
+  stopifnot(inherits(x, "MCMCParams"))
+  lapply(x@chains@chains, function(mc) coda::mcmc(colMeans(mc@Component)))
+}
+
+# Helper function to get mean probability of belonging to outlier at each iteration
+
+mcmc_get_meanoutliersProb <- function(x) {
+  stopifnot(inherits(x, "MCMCParams"))
+  lapply(x@chains@chains, function(mc) coda::mcmc(colMeans(mc@OutlierProb[, ,2])))
+}
+
+# Wrapper for the geweke diagnostics from coda package also return p-values
+
+geweke_test <- function(x) {
+  res <- matrix(NA, nrow = 2, ncol = length(x))
+  gwk <- sapply(x, coda::geweke.diag, simplify = TRUE)
+  res[1, ] <- unlist(gwk[1, ])
+  res[2, ] <- pnorm(abs(unlist(gwk[1, ])), lower.tail=FALSE) * 2
+  colnames(res) <- paste0("chain ", seq.int(x))
+  rownames(res) <- c("z.value", "p.value")
+  return(res)
+}
+
+```
+
 
 Quantifying uncertainty in the spatial distribution of proteins allows for novel
 insight into protein function. Many proteins live in a single location
@@ -36,7 +78,7 @@ model proposed in:
 The above manuscript provides a detailed description of the model, rigorous comparisons
 and testing on many spatial proteomics datasets and a case study on mouse pluripotent stem
 cells. Revisiting these details is not the purpose of this computational protocol, rather
-we present how to correctly use the software and provide step by step guidance. In breif,
+we present how to correctly use the software and provide step by step guidance. In brief,
 the TAGM model posits that each annotated sub-cellular niche can be described by a Gaussian distribution.
 Thus the full complement of proteins within the cell is captured as a mixture of Gaussians. The highly dynamic
 nature of the cell means that many proteins are not well captured by any of these 
@@ -44,8 +86,426 @@ multivariate Gaussian distributions, and thus the model also includes an outlier
 desribed as multivariate student's t distribution. The heavier tails of the t distribution allow it better
 capture dispersed proteins.
 
-To perform inference in the TAGM model there are two approaches. The first allows you to produce *maximum a posteriori*
-estimates of posterior localisation probabilities; that is, the posterior probability that a protein localises to that class.
-Whilst this is a true and interpretable summary of the TAGM model it is only point estimate. For a richer analysis, we present
-a Markov-chain Monte-Carlo method to beform fully Bayesian inference in our model, allowing us to obtain full posterior localisation distributions.
+To perform inference in the TAGM model there are two approaches. The first allows 
+you to produce *maximum a posteriori* estimates of posterior localisation 
+probabilities; that is, the posterior probability that a protein localises to that class.
+Whilst this is a true and interpretable summary of the TAGM model it is only provides
+point estimates.  For a richer analysis, we present a Markov-chain Monte-Carlo method to beform 
+fully Bayesian inference in our model, allowing us to obtain full posterior localisation distributions.
+
+In this workflow, we are currently using the development version of `pRoloc` 
+and current Bioconductor version of `pRolocdata` and `MSnbase`. 
+The pacakge `pRoloc` contains algorithms and methods for analysing
+spatial proteomics data, building on the `MSnset` structure provided in `MSnbase`. 
+The `pRolocdata` package provides many annotated datasets from a variety 
+of species and experimental procedures. The following code chunk installs the require pacakges.
+```{r, message= FALSE }
+# require(devtools)
+#install_github("lgatto/pRoloc")
+#BiocManager::install(c("MSnbase", "pRolocdata"))
+require(pRolocdata)
+```
+
+# Getting started
+
+We assume that we have a spatial proteomics dataset provided by an `MSnset`. 
+For information on how to import data, perform basic data processing and
+quality control see Lisa's workflow. We use a spatial proteomics dataset
+on Mouse E14TG2a embryonic stem cells. The LOPIT protocol was used and normalised
+intensity of proteins from eight iTRAQ 8-plex labelled fraction are provided.
+The methods provided here are independent of labelling procedure, fractionation
+process or workflow. Examples of valid experimental protocols are LOPIT, hyperLOPIT, label-free methods
+such as PCP, and when fraction is perform by differential centrifugation.
+
+In the code chunk below we load the aforementioned dataset. The printout demonstrates
+that this experiment quantified 2031 proteins over 8 fractions.
+
+```{r,}
+data("E14TG2aR")
+print(E14TG2aR)
+```
+
+We can visualise the mouse stem cell dataset use the `plot2D` function.
+
+```{r,}
+plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data")
+```
+
+
+We have found that the TAGM model sometimes fails due to floating point arithemtic errors.
+Error messages such at `error: chol(): decomposition failed` are indicative of this issue.
+Though theortically this shouldn't happen and most of the time the issue doesn't appear,
+it can occur. The failure can happen for a number of reasons such as proteins have almost
+identical profiles; highly correlated or co-linear fractions; and/or all quantitation values
+in a particular fraction are close to zero. We find performing variance stabilsation 
+normalisation (vsn) can reduce the chances of numerical issues. The following code
+chunk demonstrates performing this normalisation within R. Though this step is not
+always necessary and if you experience no such issues then you should skip this step.
+
+```{r,}
+E14TG2aR <- normalise(E14TG2aR, "vsn")
+```
+
+We can visualise the results again by using `plot2D`
+
+```{r,}
+plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data after normalisation")
+
+```
+
+# Methods: *TAGM MAP*
+
+We can perform *maximum a posteriori* estimation to perform Bayesian inference in our model. The
+*maximum a posteriori* estimate equals the mode of the posterior distribution and can be used
+to provide a point estimate summary of the posterior localisation probabilities.
+It doesn't provide samples from the posterior distribution, however an extended version
+of the expectation-maximisation (EM) algorithm can be used in our case, allowing
+fast inference. The code chunk below excutes the `tagmMapTrain` function for 
+a default of 100 iteration. We use the default priors for simplicity and convenience, however
+they can be changed, which we expkain later. The output is an object of class `MAPParams`.
+
+```{r tagmMapTrain}
+set.seed(2)
+mapRes <- tagmMapTrain(E14TG2aR)
+mapRes
+```
+The results of the modelling can be visualised with the `plotEllipse`
+function. The outer ellipse contains 99% of the total probability
+whilst the middle and inner ellipses contain 95% and 90% of the
+probability respectively. The centres of the clusters are represented
+by black circumpunct (circled dot).
+
+```{r plotEllipse}
+plotEllipse(E14TG2aR, mapRes, main = "PCA plot with probability ellipses")
+```
+We can also plot the model in other principal components. The code chunk below plots
+the probability ellipses along the first and fourth prinipal component. The user
+can change the components visualised by altering the `dims` argument.
+
+```{r,}
+plotEllipse(E14TG2aR, mapRes, dims = c(1,4), main = "PCA plot with probability ellipses along 1st and 4th prinipal components")
+```
+
+
+The EM algorithm is iterative; that is, the algorithm iterates between
+an expectation step and a maximisation step until the value of the log-posterior
+doesn't change. The value of the log-posterior at each iteration is contained within
+`posteriors` slot within the `MAPParams` object. The code chuck below plots
+the log posterior at each iteration and we see the algorithm rapidly plateaus and
+so we have acheived convergence. If convergence has not been reached during this time,
+increase the number of iteration by changing the parameter `numIter` in the `tagmMapTrain`.
+
+```{r MAPconverge, }
+plot(mapRes@posteriors$logposterior, type = "b", col = "blue", cex = 0.1, ylab = "log-posterior", xlab = "iteration", main = "log-posterior at each iteration of the EM algorithm")
+
+```
+The code chuck below  uses the `MAPParams` object to classify the proteins of
+unknown localisation using `tagmPredict` function. This method appends new columns to
+the `fData` columns of the `MSnset`.
+
+
+```{r tagmPredict}
+E14TG2aR <- tagmPredict(E14TG2aR, mapRes)
+```
+
+The new feature variables that are generated are:
+
+- `tagm.map.allocation`: the TAGM-MAP predictions for the most probable
+  protein sub-cellular allocation.
+
+```{r alloc}
+table(fData(E14TG2aR)$tagm.map.allocation)
+```
+
+- `tagm.map.probability`: the posterior probability for the protein
+  sub-cellular allocations.
+
+```{r prob}
+summary(fData(E14TG2aR)$tagm.map.probability)
+```
+
+- `tagm.map.outlier`: the posterior probability for that protein to belong
+  to the outlier component rather than any annotated component.
+
+```{r oultlier}
+summary(fData(E14TG2aR)$tagm.map.outlier)
+```
+
+We can visualise the results by scaling the pointer according the posterior
+localisation probabilities
+
+```{r mapPlotting,}
+ptsze <- fData(E14TG2aR)$tagm.map.probability
+
+plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
+```
+
+The TAGM MAP method is easy to use and it is easy to check convergence, however 
+it is limited in that it can only provide point estimates of the posterior distributions.
+To obtain the full posterior distribution we resort to using Markov-Chain Monte-Carlo
+methods. In our particular case, we use a so-called collapsed Gibbs sampler.
+
+# Methods: *TAGM MCMC* a brief overview
+
+The TAGM MCMC method allows a fully Bayesian analysis of spatial proteomics datasets.
+It employs a collapsed Gibbs sampler to obtain samples from the posterior distribution of
+localisation probablities, providing a rich analysis of the data. This section demonstrates
+the advantage of taking a Bayesian approach and the biological information that can be
+extracted from this analysis.
+
+The method is computationally intensive and requires at least modest processing power.
+Leaving the MCMC to run overnight on a modern desktop is usually sufficient, however
+this, of course, depends on the exact system properties. Do note expect the analysis
+to finish a couple of hours of a medium specification laptop, for example.
+
+To demonstrate the class structure and expected outputs of the TAGM MCMC method, we run
+a breif analysis on the a subsest of the `tan2009r1` dataset from the
+`r Biocexptpkg("pRolocdata")` purely for illustration. This is to provide a bare bones
+analysis of these data without being held back by computational requirements. We perform
+a complete demonstration and provide precise details of the analysis of the stem cell dataset 
+considered above in the next section.
+
+```{r, }
+set.seed(1)
+data(tan2009r1)
+tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
+
+```
+
+The first step is run two MCMC chains for a few iterations of the
+algorithm using the `tagmMcmcTrain` function.  This function will
+generate a object of class `MCMCParams`. The summary slot of which is
+currently empty.
+
+```{r tagmMcmcTrain}
+library("pRoloc")
+p <- tagmMcmcTrain(object = tan2009r1, numIter = 3,
+                   burnin = 1, thin = 1, numChains = 2)
+p
+```
+
+Information for each MCMC chain is contained within the chains
+slot. This information can be accessed manually if need. The function
+`MCMCProcess` populates the summary slot of the `MCMCParams` object
+
+```{r tagmMCMCProcess}
+p <- tagmMcmcProcess(p)
+p
+```
+
+The summary slot has now been populated to include basic summaries of
+the `MCMCChains`, such as allocations and localisation
+probabilities. Protein information can be appended to the feature
+columns of the `MSnSet` by using the `tagmPredict` function, which
+extracts the required information from the summary slot of the
+`MCMCParams` object.
+
+```{r tagmMcmcPredict}
+res <- tagmPredict(object = tan2009r1, params = p)
+```
+
+One can access new features variables:
+
+- `tagm.mcmc.allocation`: the TAGM-MCMC prediction for the most likely
+  protein sub-cellular annotation.
+
+```{r}
+table(fData(res)$tagm.mcmc.allocation)
+```
+
+- `tagm.mcmc.probability`: the posterior probability for the protein
+  sub-cellular allocations.
+
+```{r}
+summary(fData(res)$tagm.mcmc.probability)
+```
+As well as other useful summaries of the MCMC methods:
+
+- `tagm.mcmc.outlier` the posterior probability for the protein
+  to belong to the outlier component.
+
+- `tagm.mcmc.probability.lowerquantile` and  `tagm.mcmc.probability.upperquantile`
+ are the lower and upper boundaries to the equi-tailed 95% credible interval
+ of `tagm.mcmc.probability`.
+
+-  `tagm.mcmc.mean.shannon` a Monte-Carlo averaged shannon entropy,
+   which is a measure of uncertainty in the allocations.
+
+# Methods: *TAGM MCMC* the details
+
+```{r,}
+load("C:/Users/OllyC/Desktop/TAGMworkflow/tagmE14.rda")
+```
+
+This section explain how to manually manipulate the MCMC output of the TAGM model.
+The data file 'tagmE14.rda' is available online and is not directly loaded into 
+this package for size. The file itself if around 500mb, which is too large to directly
+load into this package. The following code, which is not evaluated, was used to produce 
+the `tagmE14` MCMCParams object. We run the MCMC algorithm for 20000 iterations with
+10000 iterations discarded for burnin. We then thin the chain by 20. We ran 6 chains
+in parallel and so we obtain 500 samples for each of the 6 chains, totalling 3000
+samples.
+
+```{r, eval = FALSE}
+tagmE14 <- tagmMcmcTrain(E14TG2aR2, 
+                         numIter = 20000, 
+                         burnin = 10000, 
+                         thin = 20, 
+                         numChains = 6)
+```
+Manually inspecting the object we see that it is a `MCMCParams` object with 6 chains
+```{r,}
+tagmE14
+```
+## Data exploration and Convergence diagnostics
+
+Assessing whether or not an MCMC algorithm has converged is challenging. Assessing
+convergence is still an active area of research and throughout the `90s many approaches
+were proposed, (see ...). Converged MCMC algorithm should be oscillating rapidly around
+a single value with no monotonicity. We provide a more detailed exploration of this issue,
+but the readers should bare in mind that the methods provided below are diagnostics
+and cannot be guarantee success. We direct readers to several important works in the
+literature discussing the assesment of convergence. Users that do not assess convergence
+and base their downstream analysis on unconverged chains are likely to obtain poor
+quality results.
+
+We first assess converged using the parallel chains methods and it precisely why 
+we produce several chains for our analysis.
+
+```{r}
+## Get number of chains
+nChains <- length(tagmE14)
+nChains
+```
+
+The following code chunks sets up a manual convegence diagnostic
+check. We make use of objects and methods in the package
+*[coda](https://CRAN.R-project.org/package=coda)* to peform this analysis [@coda].
+Our function below automatically coerces are object into *[coda](https://CRAN.R-project.org/package=coda)*
+for ease of analysis. We calculate the total number of outliers at each iteration of each chain
+and if the algorithm has converged this number should be the same (or
+very similar) across all 6 chains. We can observe this by sight by
+producing trace plots for each MCMC chain. Unconverged chains are discharded
+from downstream analysis. 
+
+```{r}
+## Convergence diagnostic to see if more we need to discard any
+## iterations or entire chains: compute the number of outliers for
+## each iteration for each chain
+out <- mcmc_get_outliers(tagmE14)
+
+## Using coda S3 objects to produce trace plots and histograms
+plot(out[[1]], col = "blue",   main = "Chain 1")
+plot(out[[2]], col = "green",  main = "Chain 2")
+plot(out[[3]], col = "red",    main = "Chain 3")
+plot(out[[4]], col = "yellow", main = "Chain 4")
+plot(out[[5]], col = "orange", main = "Chain 5")
+plot(out[[6]], col = "purple", main = "Chain 6")
+```
+All of the chains are are oscillating around 2.5 and demonstrate similar
+structure. This is indicative of convergence. We can use the 
+*[coda](https://CRAN.R-project.org/package=coda)* package to produce
+summaries of our chains. Here is the `coda` summary for the first
+chain.
+
+
+```{r}
+## all chains average around 2.5 outliers
+summary(out[[1]])
+```
+
+our analysis thus far looks very good. Each chain oscillate around an
+average of 2.5 outliers. There is no observed monotonicity in our
+output. However, for a more rigorous and unbiased analysis of
+convergence we can calculate the Gelman diagnostics using the
+*[coda](https://CRAN.R-project.org/package=coda)* package
+[@Gelman:1992,@Brools:1998]. This statistics is often refered to as
+$\hat{R}$ or the potential scale reduction factor. The idea of the
+Gelman diagnostics is to so compare the inter and intra chain
+variance. The ratio of these quantities should be close to one.  The
+actual statistics computed is more complicated, but we do not go
+deeper here and a more detailed and in depth discussion can be found
+in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
+reports the $95\%$ upper confidence interval of the $\hat{R}$
+statistic. In this case our samplers are not normally distributed
+the *[coda](https://CRAN.R-project.org/package=coda)* package allows for transform
+to improve normality of the data, in our case a log tranform is performed.
+The original paper (cite) suggests that chains with $\hat{R}$ value of 
+less than 1.2 are likely to have converged.
+
+```{r,}
+## Can check gelman diagnostic for convergence (values less than <1.05
+## are good for convergence)
+gelman.diag(out, transform = TRUE) ## the Upper C.I. is 1.03 so mcmc has likely converged
+```
+We can also look at the Gelman diagnostics statistics for groups or pairs
+of chains.
+
+```{r}
+## We can also check individual pairs of chains for convergence
+gelman.diag(out[1:3], transform = TRUE) # the upper C.I is 1.02
+gelman.diag(out[c(2,5)], transform = TRUE) # the upper C.I is 1.08
+```
+
+Aswell as outliers, we can look at the mean component allocation at each
+iteration of the MCMC algorithm and as before we produce trace plots of this
+quantity.
+
+```{r,}
+# Compute the mean component allocation at each mcmc iterations
+meanAlloc <- mcmc_get_meanComponent(tagmE14)
+
+
+plot(meanAlloc[[1]], col = "blue",   main = "Chain 1")
+plot(meanAlloc[[2]], col = "green",  main = "Chain 2")
+plot(meanAlloc[[3]], col = "red",    main = "Chain 3")
+plot(meanAlloc[[4]], col = "yellow", main = "Chain 4")
+plot(meanAlloc[[5]], col = "orange", main = "Chain 5")
+plot(meanAlloc[[6]], col = "purple", main = "Chain 6")
+```
+As before we can produce summaries of the data.
+```{r,}
+summary(meanAlloc[[1]])
+```
+We can already observe that there are difference between these chains and they oscillate around
+slightly different values, this raises suspicion that some of the chains may not have converged.
+We again apply the Gelamn diagnostics to these summaries.
+```{r,}
+gelman.diag(meanAlloc)
+```
+The above values are quite distant from 1 and therefore we should not believe these chains
+have converged. We can see that chains $3,5,6$ look quite different from the other
+chains and so we recalculate the diagnostic excluding these chains. The computer gelman
+diagnostic below suggest that chains $1,2$ and $4$ have converged and taht we should
+discard chains $3,4$ and $6$ from further analysis.
+
+```{r,}
+gelman.diag(meanAlloc[c(1,2,4)])
+```
+
+For a further check, we can look at the mean Outlier probability at each iteration
+of the MCMC algorithm and again computing the Gelman diagnostics between chains $1,2$
+and $4$.
+
+```{r,}
+meanoutProb <- mcmc_get_meanoutliersProb(tagmE14)
+gelman.diag(meanoutProb[c(1,2,4)])
+```
+Along with the Gelman diagnostics, we can also apply a single chain analysis
+using the Geweke diagnostics. The Geweke diagnostics tests to see whether the 
+mean calculate from the first $10\%$ of iteration is significantly different
+from the the mean calculated from  last $50\%$ of iterations. If they are
+significantly different (at say a level 0.01) then this is evidence that particular
+chains has not converged. The following code chunk calculates the Geweke diagnostic
+for each chain on the quantities we have looked at previously.
+
+```{r,}
+geweke_test(out)
+geweke_test(meanAlloc)
+geweke_test(meanoutProb)
+```
+The first test suggest chain 3 has not converged whilst the second test
+suggests that chain 6 has not converged supporting our earlier beliefs that
+these chains have not conveged. Further objects and plots can be used to assess
+convergence, but we do not go into any further details.
 
