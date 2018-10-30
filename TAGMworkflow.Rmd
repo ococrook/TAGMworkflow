@@ -115,7 +115,7 @@ on Mouse E14TG2a embryonic stem cells. The LOPIT protocol was used and normalise
 intensity of proteins from eight iTRAQ 8-plex labelled fraction are provided.
 The methods provided here are independent of labelling procedure, fractionation
 process or workflow. Examples of valid experimental protocols are LOPIT, hyperLOPIT, label-free methods
-such as PCP, and when fraction is perform by differential centrifugation.
+such as PCP, and when fractionation is perform by differential centrifugation.
 
 In the code chunk below we load the aforementioned dataset. The printout demonstrates
 that this experiment quantified 2031 proteins over 8 fractions.
@@ -125,7 +125,9 @@ data("E14TG2aR")
 print(E14TG2aR)
 ```
 
-We can visualise the mouse stem cell dataset use the `plot2D` function.
+We can visualise the mouse stem cell dataset use the `plot2D` function. As
+we can see some of the classes overlap - it is there vital to perform
+uncertainty quantification when analysising this data.
 
 ```{r,}
 plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data")
@@ -162,7 +164,7 @@ It doesn't provide samples from the posterior distribution, however an extended 
 of the expectation-maximisation (EM) algorithm can be used in our case, allowing
 fast inference. The code chunk below excutes the `tagmMapTrain` function for 
 a default of 100 iteration. We use the default priors for simplicity and convenience, however
-they can be changed, which we expkain later. The output is an object of class `MAPParams`.
+they can be changed, which we explain later. The output is an object of class `MAPParams`.
 
 ```{r tagmMapTrain}
 set.seed(2)
@@ -194,6 +196,8 @@ doesn't change. The value of the log-posterior at each iteration is contained wi
 the log posterior at each iteration and we see the algorithm rapidly plateaus and
 so we have acheived convergence. If convergence has not been reached during this time,
 increase the number of iteration by changing the parameter `numIter` in the `tagmMapTrain`.
+In practice, it is not unexpected to observe small fluctations due to numerical errors
+and users should not be concerned by this.
 
 ```{r MAPconverge, }
 plot(mapRes@posteriors$logposterior, type = "b", col = "blue", cex = 0.1, ylab = "log-posterior", xlab = "iteration", main = "log-posterior at each iteration of the EM algorithm")
