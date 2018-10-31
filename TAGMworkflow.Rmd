@@ -2,6 +2,9 @@
 title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
 author:
 - name: Oliver M. Crook
+- name: Lisa Breckels
+- name: Kathryn Lilley
+- name: Paul D.W. Kirk
 - name: Laurent Gatto
 package: pRoloc
 output:
@@ -83,13 +86,13 @@ the TAGM model posits that each annotated sub-cellular niche can be described by
 Thus the full complement of proteins within the cell is captured as a mixture of Gaussians. The highly dynamic
 nature of the cell means that many proteins are not well captured by any of these 
 multivariate Gaussian distributions, and thus the model also includes an outlier component, mathematically
-desribed as multivariate student's t distribution. The heavier tails of the t distribution allow it better
+desribed as multivariate student's t distribution. The heavy tails of the t distribution allow it to better
 capture dispersed proteins.
 
 To perform inference in the TAGM model there are two approaches. The first allows 
-you to produce *maximum a posteriori* estimates of posterior localisation 
+us to obtain *maximum a posteriori* estimates of posterior localisation 
 probabilities; that is, the posterior probability that a protein localises to that class.
-Whilst this is a true and interpretable summary of the TAGM model it is only provides
+Whilst this is a interpretable summary of the TAGM model it only provides
 point estimates.  For a richer analysis, we present a Markov-chain Monte-Carlo method to beform 
 fully Bayesian inference in our model, allowing us to obtain full posterior localisation distributions.
 
@@ -100,8 +103,8 @@ spatial proteomics data, building on the `MSnset` structure provided in `MSnbase
 The `pRolocdata` package provides many annotated datasets from a variety 
 of species and experimental procedures. The following code chunk installs the require pacakges.
 ```{r, message= FALSE }
-# require(devtools)
-#install_github("lgatto/pRoloc")
+ require(devtools)
+install_github("lgatto/pRoloc")
 #BiocManager::install(c("MSnbase", "pRolocdata"))
 require(pRolocdata)
 ```
@@ -109,11 +112,11 @@ require(pRolocdata)
 # Getting started
 
 We assume that we have a spatial proteomics dataset provided by an `MSnset`. 
-For information on how to import data, perform basic data processing and
-quality control see Lisa's workflow. We use a spatial proteomics dataset
-on Mouse E14TG2a embryonic stem cells. The LOPIT protocol was used and normalised
-intensity of proteins from eight iTRAQ 8-plex labelled fraction are provided.
-The methods provided here are independent of labelling procedure, fractionation
+For information on how to import data, perform basic data processing,
+quality control, supervised machine learning and transfer learning see Lisa's workflow.
+We use a spatial proteomics dataset on Mouse E14TG2a embryonic stem cells. 
+The LOPIT protocol was used and normalised intensity of proteins from eight iTRAQ 8-plex
+labelled fraction are provided. The methods provided here are independent of labelling procedure, fractionation
 process or workflow. Examples of valid experimental protocols are LOPIT, hyperLOPIT, label-free methods
 such as PCP, and when fractionation is perform by differential centrifugation.
 
@@ -185,7 +188,7 @@ the probability ellipses along the first and fourth prinipal component. The user
 can change the components visualised by altering the `dims` argument.
 
 ```{r,}
-plotEllipse(E14TG2aR, mapRes, dims = c(1,4), main = "PCA plot with probability ellipses along 1st and 4th prinipal components")
+plotEllipse(E14TG2aR, mapRes, dims = c(1, 4), main = "PCA plot with probability ellipses along 1st and 4th prinipal components")
 ```
 
 
@@ -260,10 +263,10 @@ extracted from this analysis.
 The method is computationally intensive and requires at least modest processing power.
 Leaving the MCMC to run overnight on a modern desktop is usually sufficient, however
 this, of course, depends on the exact system properties. Do note expect the analysis
-to finish a couple of hours of a medium specification laptop, for example.
+to finish in a couple of hours on a medium specification laptop, for example.
 
 To demonstrate the class structure and expected outputs of the TAGM MCMC method, we run
-a breif analysis on the a subsest of the `tan2009r1` dataset from the
+a brief analysis on the a subsest of the `tan2009r1` dataset from the
 `r Biocexptpkg("pRolocdata")` purely for illustration. This is to provide a bare bones
 analysis of these data without being held back by computational requirements. We perform
 a complete demonstration and provide precise details of the analysis of the stem cell dataset 
@@ -364,17 +367,18 @@ tagmE14
 ## Data exploration and Convergence diagnostics
 
 Assessing whether or not an MCMC algorithm has converged is challenging. Assessing
-convergence is still an active area of research and throughout the `90s many approaches
+and diagnosing convergence is an active area of research and throughout the `90s many approaches
 were proposed, (see ...). Converged MCMC algorithm should be oscillating rapidly around
 a single value with no monotonicity. We provide a more detailed exploration of this issue,
 but the readers should bare in mind that the methods provided below are diagnostics
-and cannot be guarantee success. We direct readers to several important works in the
+and cannot guarantee success. We direct readers to several important works in the
 literature discussing the assesment of convergence. Users that do not assess convergence
 and base their downstream analysis on unconverged chains are likely to obtain poor
 quality results.
 
-We first assess converged using the parallel chains methods and it precisely why 
-we produce several chains for our analysis.
+We first assess converged using a parallel chains approach. Producing multiple
+chains is benifical not only for computational advantages but also for
+analysis of convergence of our chains.
 
 ```{r}
 ## Get number of chains
@@ -385,11 +389,11 @@ nChains
 The following code chunks sets up a manual convegence diagnostic
 check. We make use of objects and methods in the package
 *[coda](https://CRAN.R-project.org/package=coda)* to peform this analysis [@coda].
-Our function below automatically coerces are object into *[coda](https://CRAN.R-project.org/package=coda)*
+Our function below automatically coerces our objects into *[coda](https://CRAN.R-project.org/package=coda)*
 for ease of analysis. We calculate the total number of outliers at each iteration of each chain
 and if the algorithm has converged this number should be the same (or
-very similar) across all 6 chains. We can observe this by sight by
-producing trace plots for each MCMC chain. Unconverged chains are discharded
+very similar) across all 6 chains. We can observe this from the trace plots
+and histrograms for each MCMC chain. Unconverged chains are discharded
 from downstream analysis. 
 
 ```{r}
@@ -417,16 +421,17 @@ chain.
 ## all chains average around 2.5 outliers
 summary(out[[1]])
 ```
+### Applying the Gelman Diagnostic
 
-our analysis thus far looks very good. Each chain oscillate around an
+Thus far, our analysis looks very good. Each chain oscillate around an
 average of 2.5 outliers. There is no observed monotonicity in our
 output. However, for a more rigorous and unbiased analysis of
 convergence we can calculate the Gelman diagnostics using the
 *[coda](https://CRAN.R-project.org/package=coda)* package
 [@Gelman:1992,@Brools:1998]. This statistics is often refered to as
 $\hat{R}$ or the potential scale reduction factor. The idea of the
-Gelman diagnostics is to so compare the inter and intra chain
-variance. The ratio of these quantities should be close to one.  The
+Gelman diagnostics is to compare the inter and intra chain
+variances. The ratio of these quantities should be close to one.  The
 actual statistics computed is more complicated, but we do not go
 deeper here and a more detailed and in depth discussion can be found
 in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
@@ -479,27 +484,30 @@ gelman.diag(meanAlloc)
 ```
 The above values are quite distant from 1 and therefore we should not believe these chains
 have converged. We can see that chains $3,5,6$ look quite different from the other
-chains and so we recalculate the diagnostic excluding these chains. The computer gelman
-diagnostic below suggest that chains $1,2$ and $4$ have converged and taht we should
+chains and so we recalculate the diagnostic excluding these chains. The computed gelman
+diagnostic below suggest that chains $1,2$ and $4$ have converged and that we should
 discard chains $3,4$ and $6$ from further analysis.
 
 ```{r,}
 gelman.diag(meanAlloc[c(1,2,4)])
 ```
 
-For a further check, we can look at the mean Outlier probability at each iteration
+For a further check, we can look at the mean outlier probability at each iteration
 of the MCMC algorithm and again computing the Gelman diagnostics between chains $1,2$
-and $4$.
+and $4$. An $\hat(R)$ statistics of $1$ is indicative of convergence
 
 ```{r,}
 meanoutProb <- mcmc_get_meanoutliersProb(tagmE14)
 gelman.diag(meanoutProb[c(1,2,4)])
 ```
-Along with the Gelman diagnostics, we can also apply a single chain analysis
-using the Geweke diagnostics. The Geweke diagnostics tests to see whether the 
-mean calculate from the first $10\%$ of iteration is significantly different
-from the the mean calculated from  last $50\%$ of iterations. If they are
-significantly different (at say a level 0.01) then this is evidence that particular
+
+### Applying the Geweke Diagnostic
+
+Along with the Gelman diagnostics, which use parallel chains, 
+we can also apply a single chain analysis using the Geweke diagnostic.
+The Geweke diagnostic tests to see whether the mean calculate from the first $10\%$ 
+of iterations are significantly different from the the mean calculated from  last $50\%$ of iterations.
+If they are significantly different (at say a level 0.01) then this is evidence that particular
 chains has not converged. The following code chunk calculates the Geweke diagnostic
 for each chain on the quantities we have looked at previously.
 
@@ -510,6 +518,33 @@ geweke_test(meanoutProb)
 ```
 The first test suggest chain 3 has not converged whilst the second test
 suggests that chain 6 has not converged supporting our earlier beliefs that
-these chains have not conveged. Further objects and plots can be used to assess
-convergence, but we do not go into any further details.
+these chains have not conveged. Users can use this method to explore
+other outputs should they wish. 
 
+An important question at this point is if removing
+early portion of the chain might lead to improvment of the convergence diagonistics.
+This my particularly relevant if a chain converges some iterations after our
+`burin` specified orginally. For example let us take the first Geweke test
+above, which suggested chain 3 had not converged and see if discarding the initial
+$10\%$ of the chain improves the statistic. The function below removes $50$ samples
+, informaly known as burning, from the beginning of each chain and the output shows that we now have $450$
+samples in each chain.
+
+```{r}
+burntagmE14 <- mcmc_burn_chains(tagmE14, 50)
+burntagmE14@chains@chains
+```
+The following function recomputes the number of outliers in each chain at each iteration
+of each Markov-chain.
+```{r}
+newout <- mcmc_get_outliers(burntagmE14)
+```
+The code chuck below compute the Geweke diagonstic for this new truncated chain
+and demonstrates that chain 3 has an improved Geweke diagnostic. Thus, in practice,
+it maybe useful to remove iterations from the beginning of the chain. However,
+as chain 3 did not pass the Gelman diagnostics we still discard it from downstream
+analysis.
+```{r}
+geweke_test(newout)
+```
+## Processing converged chains
