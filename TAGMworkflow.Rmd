@@ -1,16 +1,15 @@
 ---
 title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
 author:
-- name: Oliver M. Crook
-- name: Lisa Breckels
-- name: Kathryn Lilley
-- name: Paul D.W. Kirk
-- name: Laurent Gatto
+- Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
 package: pRoloc
-output:
-  BiocStyle::html_document:
-   toc_float: true
+output: pdf_document
+
+#output:
+#  BiocStyle::html_document:
+#   toc_float: true
 ---
+
 
 # Version
   <p>
@@ -69,9 +68,35 @@ dynamically relocalise. Functional comparmentalisation of proteins allows the ce
 biomolecular pathways and biochemical process within the cell. Therefore, proteins
 with multiple localisation may have mutiple functional roles. Machine learning algorithms
 that fail to quantify uncertainty are unable to draw deeper insight into understanding
-cell biology.
+cell biology from mass-spectrometry (MS) based spatial proteomics experiments.
 
-We present a worflow for the Bayesian analysis of spatial proteomics using the t-augmented Gaussian mixture (TAGM)
+Bayesian approaches to machine learning and statistical analysis can provide 
+more insight into the data, since uncertainty quantification arises as a consequence
+of a generative model for the data. In a Bayesian framework, a model
+with paramters for the data is proposed, along with a statement about our prior 
+beliefs of the model paramters. Bayes' theorem tells us how to update the prior 
+distribution of the parameters to obtain the posterior
+distribution of the parameters after observing the data. It is the 
+posterior distribution which quantifies the uncertainty in the parameters
+and quantities of interest derived from the data. This contrasts from a 
+maximum-likelihood approach where we obtain only a point estimate of the 
+parameters.
+
+Adopting a Bayesian framework for data analysis, though of much interest
+to experimentalists, can be challenging. Once we have
+obtained a probabilistic model, complex algorithms are used to obtain
+the posterior distribution upon observation of the data. These algorithms
+can have tuning parameters and many settings, hindering their practical use
+for those not versed in Bayesian methodology. Even once the algorithms
+have been correctly set-up, assessments of convergence and guidance on 
+how to intepret the results are often sparse. This workflow presents a Bayesian
+analysis of spatial proteomics to  elucidate the process to any practioners 
+We hope that it goes beyond 
+simply the methods, data structures and biology presented here,
+but provides a template for others to design tools using Bayesian
+methodology for the biological community.
+
+Our model for the data is the t-augmented Gaussian mixture (TAGM)
 model proposed in:
 
 > A Bayesian Mixture Modelling Approach For Spatial Proteomics Oliver
@@ -79,22 +104,41 @@ model proposed in:
 > Gatto bioRxiv 282269; doi: https://doi.org/10.1101/282269
 
 The above manuscript provides a detailed description of the model, rigorous comparisons
-and testing on many spatial proteomics datasets and a case study on mouse pluripotent stem
+and testing on many spatial proteomics datasets and a case study on 
+a hyperLOPIT experiment on mouse pluripotent stem
 cells. Revisiting these details is not the purpose of this computational protocol, rather
-we present how to correctly use the software and provide step by step guidance. In brief,
-the TAGM model posits that each annotated sub-cellular niche can be described by a Gaussian distribution.
+we present how to correctly use the software and provide step by step guidance
+for interpreting the results.
+
+In brief, the TAGM model posits that each annotated sub-cellular niche can be described by a Gaussian distribution.
 Thus the full complement of proteins within the cell is captured as a mixture of Gaussians. The highly dynamic
 nature of the cell means that many proteins are not well captured by any of these 
 multivariate Gaussian distributions, and thus the model also includes an outlier component, mathematically
-desribed as multivariate student's t distribution. The heavy tails of the t distribution allow it to better
+described as multivariate student's t distribution. The heavy tails of the t distribution allow it to better
 capture dispersed proteins.
 
-To perform inference in the TAGM model there are two approaches. The first allows 
+To perform inference in the TAGM model there are two approaches. The first,
+which we refer to as TAGM-MAP, allows 
 us to obtain *maximum a posteriori* estimates of posterior localisation 
-probabilities; that is, the posterior probability that a protein localises to that class.
-Whilst this is a interpretable summary of the TAGM model it only provides
-point estimates.  For a richer analysis, we present a Markov-chain Monte-Carlo method to beform 
+probabilities; that is, the modal posterior probability that a protein localises to that class.
+This approach uses the expectation-maximisation (EM) algorithm to perform inference.
+Whilst this is a interpretable summary of the TAGM model, it only provides
+point estimates.  For a richer analysis, we present a Markov-chain Monte-Carlo (MCMC) method to perform 
 fully Bayesian inference in our model, allowing us to obtain full posterior localisation distributions.
+This method is refered to as TAGM-MCMC throughout the text.
+
+This workflow begins with a brief review of some of the basic features of
+mass-spectrometry based spatial proteomics data, including the 
+state-of-the-art computational infrastructure and bespoke software suite. 
+We then present each method in turn, detailing how to obtain high quality
+results. We provide an extended dicussion of the TAGM-MCMC method
+to highlight some of the challenges when apply this method. This includes
+how to assess convergence of MCMC methods, as well as methods for manipulating
+the output. We then take the processed output and explain how to intepret
+the results, as well as providing some tools for visualisation. We conclude
+with some remarks and direction for the future.
+
+# Getting started and infrastructure
 
 In this workflow, we are currently using the development version of `pRoloc` 
 and current Bioconductor version of `pRolocdata` and `MSnbase`. 
@@ -108,8 +152,6 @@ install_github("lgatto/pRoloc")
 #BiocManager::install(c("MSnbase", "pRolocdata"))
 require(pRolocdata)
 ```
-
-# Getting started
 
 We assume that we have a spatial proteomics dataset provided by an `MSnset`. 
 For information on how to import data, perform basic data processing,
@@ -154,11 +196,15 @@ E14TG2aR <- normalise(E14TG2aR, "vsn")
 We can visualise the results again by using `plot2D`
 
 ```{r,}
-plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data after normalisation")
+plot2D(E14TG2aR,
+       main = "PCA of mouse stem cell data after normalisation")
 
 ```
 
+\newpage
 # Methods: *TAGM MAP*
+
+## Introduction to TAGM MAP
 
 We can perform *maximum a posteriori* estimation to perform Bayesian inference in our model. The
 *maximum a posteriori* estimate equals the mode of the posterior distribution and can be used
@@ -178,19 +224,21 @@ The results of the modelling can be visualised with the `plotEllipse`
 function. The outer ellipse contains 99% of the total probability
 whilst the middle and inner ellipses contain 95% and 90% of the
 probability respectively. The centres of the clusters are represented
-by black circumpunct (circled dot).
-
-```{r plotEllipse}
-plotEllipse(E14TG2aR, mapRes, main = "PCA plot with probability ellipses")
-```
-We can also plot the model in other principal components. The code chunk below plots
-the probability ellipses along the first and fourth prinipal component. The user
+by black circumpunct (circled dot). We can also plot the model in other principal components.
+The code chunk below plots the probability ellipses along the first and second, 
+as well as the fourth prinipal component. The user
 can change the components visualised by altering the `dims` argument.
 
-```{r,}
-plotEllipse(E14TG2aR, mapRes, dims = c(1, 4), main = "PCA plot with probability ellipses along 1st and 4th prinipal components")
+```{r plotEllipse, fig.width= 8, fig.height=10}
+par(mfrow = c(2, 1)) ## Create two panels
+plotEllipse(E14TG2aR, mapRes, main = "PCA plot with probability ellipses")
+plotEllipse(E14TG2aR, 
+            mapRes, 
+            dims = c(1, 4), 
+            main = "Ellipse plot along 1st and 4th prinipal components")
 ```
 
+## The expectation-maximisation algorithm
 
 The EM algorithm is iterative; that is, the algorithm iterates between
 an expectation step and a maximisation step until the value of the log-posterior
@@ -203,7 +251,9 @@ In practice, it is not unexpected to observe small fluctations due to numerical 
 and users should not be concerned by this.
 
 ```{r MAPconverge, }
-plot(mapRes@posteriors$logposterior, type = "b", col = "blue", cex = 0.1, ylab = "log-posterior", xlab = "iteration", main = "log-posterior at each iteration of the EM algorithm")
+plot(mapRes@posteriors$logposterior, type = "b", col = "blue", 
+     cex = 0.1, ylab = "log-posterior", xlab = "iteration", 
+     main = "log-posterior at each iteration of the EM algorithm")
 
 ```
 The code chuck below  uses the `MAPParams` object to classify the proteins of
@@ -267,7 +317,7 @@ to finish in a couple of hours on a medium specification laptop, for example.
 
 To demonstrate the class structure and expected outputs of the TAGM MCMC method, we run
 a brief analysis on the a subsest of the `tan2009r1` dataset from the
-`r Biocexptpkg("pRolocdata")` purely for illustration. This is to provide a bare bones
+`pRolocdata` purely for illustration. This is to provide a bare bones
 analysis of these data without being held back by computational requirements. We perform
 a complete demonstration and provide precise details of the analysis of the stem cell dataset 
 considered above in the next section.
@@ -364,7 +414,7 @@ Manually inspecting the object we see that it is a `MCMCParams` object with 6 ch
 ```{r,}
 tagmE14
 ```
-## Data exploration and Convergence diagnostics
+## Data exploration and convergence diagnostics
 
 Assessing whether or not an MCMC algorithm has converged is challenging. Assessing
 and diagnosing convergence is an active area of research and throughout the `90s many approaches
@@ -396,7 +446,7 @@ very similar) across all 6 chains. We can observe this from the trace plots
 and histrograms for each MCMC chain. Unconverged chains are discharded
 from downstream analysis. 
 
-```{r}
+```{r, fig.width=8, fig.height=5}
 ## Convergence diagnostic to see if more we need to discard any
 ## iterations or entire chains: compute the number of outliers for
 ## each iteration for each chain
@@ -421,7 +471,7 @@ chain.
 ## all chains average around 2.5 outliers
 summary(out[[1]])
 ```
-### Applying the Gelman Diagnostic
+### Applying the Gelman diagnostic
 
 Thus far, our analysis looks very good. Each chain oscillate around an
 average of 2.5 outliers. There is no observed monotonicity in our
@@ -460,7 +510,7 @@ Aswell as outliers, we can look at the mean component allocation at each
 iteration of the MCMC algorithm and as before we produce trace plots of this
 quantity.
 
-```{r,}
+```{r, fig.width=8, fig.height=5}
 # Compute the mean component allocation at each mcmc iterations
 meanAlloc <- mcmc_get_meanComponent(tagmE14)
 
@@ -501,7 +551,7 @@ meanoutProb <- mcmc_get_meanoutliersProb(tagmE14)
 gelman.diag(meanoutProb[c(1,2,4)])
 ```
 
-### Applying the Geweke Diagnostic
+### Applying the Geweke diagnostic
 
 Along with the Gelman diagnostics, which use parallel chains, 
 we can also apply a single chain analysis using the Geweke diagnostic.
