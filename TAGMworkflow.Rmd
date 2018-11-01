@@ -90,7 +90,7 @@ can have tuning parameters and many settings, hindering their practical use
 for those not versed in Bayesian methodology. Even once the algorithms
 have been correctly set-up, assessments of convergence and guidance on 
 how to intepret the results are often sparse. This workflow presents a Bayesian
-analysis of spatial proteomics to  elucidate the process to any practioners 
+analysis of spatial proteomics to  elucidate the process to any practioners. 
 We hope that it goes beyond 
 simply the methods, data structures and biology presented here,
 but provides a template for others to design tools using Bayesian
@@ -136,25 +136,26 @@ to highlight some of the challenges when apply this method. This includes
 how to assess convergence of MCMC methods, as well as methods for manipulating
 the output. We then take the processed output and explain how to intepret
 the results, as well as providing some tools for visualisation. We conclude
-with some remarks and direction for the future.
+with some remarks and directions for the future.
 
 # Getting started and infrastructure
 
 In this workflow, we are currently using the development version of `pRoloc` 
-and current Bioconductor version of `pRolocdata` and `MSnbase`. 
+and the current Bioconductor version of `pRolocdata` and `MSnbase`. 
 The pacakge `pRoloc` contains algorithms and methods for analysing
-spatial proteomics data, building on the `MSnset` structure provided in `MSnbase`. 
+spatial proteomics data, building on the `MSnSet` structure provided in `MSnbase`. 
 The `pRolocdata` package provides many annotated datasets from a variety 
-of species and experimental procedures. The following code chunk installs the require pacakges.
-```{r, message= FALSE }
- require(devtools)
-install_github("lgatto/pRoloc")
+of species and experimental procedures. The following code chunk installs the 
+software suite of packages require for analysis.
+```{r, message= FALSE}
+# require(devtools)
+#install_github("lgatto/pRoloc")
 #BiocManager::install(c("MSnbase", "pRolocdata"))
 require(pRolocdata)
 ```
 
-We assume that we have a spatial proteomics dataset provided by an `MSnset`. 
-For information on how to import data, perform basic data processing,
+We assume that we have a MS-based spatial proteomics dataset contained in a `MSnSet`
+structure. For information on how to import data, perform basic data processing,
 quality control, supervised machine learning and transfer learning see Lisa's workflow.
 We use a spatial proteomics dataset on Mouse E14TG2a embryonic stem cells. 
 The LOPIT protocol was used and normalised intensity of proteins from eight iTRAQ 8-plex
@@ -162,22 +163,24 @@ labelled fraction are provided. The methods provided here are independent of lab
 process or workflow. Examples of valid experimental protocols are LOPIT, hyperLOPIT, label-free methods
 such as PCP, and when fractionation is perform by differential centrifugation.
 
-In the code chunk below we load the aforementioned dataset. The printout demonstrates
+In the code chunk below, we load the aforementioned dataset. The printout demonstrates
 that this experiment quantified 2031 proteins over 8 fractions.
 
 ```{r,}
-data("E14TG2aR")
-print(E14TG2aR)
+data("E14TG2aR") # load experimental data
+E14TG2aR
 ```
 
-We can visualise the mouse stem cell dataset use the `plot2D` function. As
-we can see some of the classes overlap - it is there vital to perform
-uncertainty quantification when analysising this data.
+We can visualise the mouse stem cell dataset use the `plot2D` function. We
+observe that some of the organlles classes overlap and this is a typical 
+feature of biological datasets. Thus, it is vital to perform
+uncertainty quantification when analysising biological data.
 
 ```{r,}
 plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data")
 ```
 
+## Aside: normalisation
 
 We have found that the TAGM model sometimes fails due to floating point arithemtic errors.
 Error messages such at `error: chol(): decomposition failed` are indicative of this issue.
@@ -206,14 +209,19 @@ plot2D(E14TG2aR,
 
 ## Introduction to TAGM MAP
 
-We can perform *maximum a posteriori* estimation to perform Bayesian inference in our model. The
+We can perform *maximum a posteriori* (MAP) estimation to perform Bayesian inference in our model. The
 *maximum a posteriori* estimate equals the mode of the posterior distribution and can be used
 to provide a point estimate summary of the posterior localisation probabilities.
-It doesn't provide samples from the posterior distribution, however an extended version
+It does not provide samples from the posterior distribution, however an extended version
 of the expectation-maximisation (EM) algorithm can be used in our case, allowing
-fast inference. The code chunk below excutes the `tagmMapTrain` function for 
-a default of 100 iteration. We use the default priors for simplicity and convenience, however
-they can be changed, which we explain later. The output is an object of class `MAPParams`.
+fast inference. The EM algorithm is an algorithm that iterates between an expectation step
+and a maximisation step. This allows us to find parameters which maximise the logarithm
+of the posterior, in the presence of latent (unobserved) variables. The EM algorithm is 
+guaranteed to converge to a local mode. The code chunk below 
+excutes the `tagmMapTrain` function for a default of 100 iterations. 
+We use the default priors for simplicity and convenience, however
+they can be changed, which we explain in a later section.
+The output is an object of class `MAPParams`.
 
 ```{r tagmMapTrain}
 set.seed(2)
@@ -242,13 +250,14 @@ plotEllipse(E14TG2aR,
 
 The EM algorithm is iterative; that is, the algorithm iterates between
 an expectation step and a maximisation step until the value of the log-posterior
-doesn't change. The value of the log-posterior at each iteration is contained within
-`posteriors` slot within the `MAPParams` object. The code chuck below plots
+does not change. This fact can be used to assess the convergence of the EM
+algoritm. The value of the log-posterior at each iteration is contained within
+the `posteriors` slot within the `MAPParams` object. The code chuck below plots
 the log posterior at each iteration and we see the algorithm rapidly plateaus and
 so we have acheived convergence. If convergence has not been reached during this time,
-increase the number of iteration by changing the parameter `numIter` in the `tagmMapTrain`.
-In practice, it is not unexpected to observe small fluctations due to numerical errors
-and users should not be concerned by this.
+increase the number of iteration by changing the parameter `numIter` in the `tagmMapTrain`
+method. In practice, it is not unexpected to observe small fluctations due to numerical errors
+and this should not be concerned users.
 
 ```{r MAPconverge, }
 plot(mapRes@posteriors$logposterior, type = "b", col = "blue", 
@@ -258,11 +267,11 @@ plot(mapRes@posteriors$logposterior, type = "b", col = "blue",
 ```
 The code chuck below  uses the `MAPParams` object to classify the proteins of
 unknown localisation using `tagmPredict` function. This method appends new columns to
-the `fData` columns of the `MSnset`.
+the `fData` columns of the `MSnSet`.
 
 
 ```{r tagmPredict}
-E14TG2aR <- tagmPredict(E14TG2aR, mapRes)
+E14TG2aR <- tagmPredict(E14TG2aR, mapRes) # Predict protein localisation
 ```
 
 The new feature variables that are generated are:
@@ -289,18 +298,22 @@ summary(fData(E14TG2aR)$tagm.map.outlier)
 ```
 
 We can visualise the results by scaling the pointer according the posterior
-localisation probabilities
+localisation probabilities. To do this we extract the MAP localisation
+probabilities from the feature columns of the the `MSnSet` and pass these
+to the `plot2D` function.
 
-```{r mapPlotting,}
-ptsze <- fData(E14TG2aR)$tagm.map.probability
+```{r mapPlotting, fig.height=4.3}
+ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
 
-plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
+plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze,
+       main = "TAGM-MAP allocations")
 ```
 
-The TAGM MAP method is easy to use and it is easy to check convergence, however 
-it is limited in that it can only provide point estimates of the posterior distributions.
-To obtain the full posterior distribution we resort to using Markov-Chain Monte-Carlo
-methods. In our particular case, we use a so-called collapsed Gibbs sampler.
+The TAGM MAP method is easy to use and it is simple to check convergence, however 
+it is limited in that it can only provide point estimates of the posterior 
+localisation distributions. To obtain the full posterior distributions,
+we resort to using Markov-Chain Monte-Carlo methods. 
+In our particular case, we use a so-called collapsed Gibbs sampler.
 
 # Methods: *TAGM MCMC* a brief overview
 
@@ -309,6 +322,23 @@ It employs a collapsed Gibbs sampler to obtain samples from the posterior distri
 localisation probablities, providing a rich analysis of the data. This section demonstrates
 the advantage of taking a Bayesian approach and the biological information that can be
 extracted from this analysis.
+
+Since our audience is unlikely to be versed in Bayesian methodology, we explain
+some of the key ideas for a more complete understanding. Firstly, MCMC-based
+inference constrasts with MAP based inference in that in produces \textit{samples}
+from the posterior distribution of localisation probabilities. Hence, we do not
+just have a single estimate for each quantity but a distribution
+(or histogram) of estimates. MCMC methods are a large class of algorithms used to sample from 
+a probability distribution, in our case the posterior distribution of the parameters.
+They design a Markov-chain; that is, a random sequence of events where the 
+probability of the next event only depends on the current state, which, after
+convergence obtain samples form the posterior distribution. A specific
+example of an MCMC algorithm is the Gibbs sampler, which can be applied when
+the parameters are conditionally conjugate. Often one can perform Rao-Blackwellisation,
+a method to reduce posterior variance, to obtain a collapsed Gibbs sampler.
+Once one has obtained samples from the posterior distribution, we can estimate the
+true mean of the posterior distribution by simply taking the mean of the samples.
+In a similar fashion, we can obtain other summaries of the posterior distribution.
 
 The method is computationally intensive and requires at least modest processing power.
 Leaving the MCMC to run overnight on a modern desktop is usually sufficient, however
