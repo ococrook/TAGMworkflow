@@ -575,17 +575,17 @@ As well as other useful summaries of the MCMC methods:
 # Methods: *TAGM MCMC* the details
 
 ```{r,}
-load("C:/Users/OllyC/Desktop/TAGMworkflow/tagmE14.rda")
+load("tagmE14.rda")
 ```
 
-This section explain how to manually manipulate the MCMC output of the TAGM model.
+This section explains how to manually manipulate the MCMC output of the TAGM model.
 The data file 'tagmE14.rda' is available online and is not directly loaded into 
 this package for size. The file itself if around 500mb, which is too large to directly
 load into a package. The following code, which is not evaluated, was used to produce 
 the `tagmE14` MCMCParams object. We run the MCMC algorithm for 20000 iterations with
 10000 iterations discarded for burnin. We then thin the chain by 20. We ran 6 chains
 in parallel and so we obtain 500 samples for each of the 6 chains, totalling 3000
-samples.
+samples. The resulting file is assumed to be in our working directory.
 
 ```{r, eval = FALSE}
 tagmE14 <- tagmMcmcTrain(E14TG2aR2, 
@@ -854,9 +854,85 @@ E14TG2aR <- tagmPredict(object = E14TG2aR,
 head(fData(E14TG2aR))
   
 ```
+## Aside: *Priors*
 
 
-## Analysis, visualisation and interpreting results
 
-Now that we have singled pooled chain of 
+## Analysis, visualisation and interpretation of results
 
+Now that we have single pooled chain of samples from a converged MCMC algorithm,
+we can begin to analyse the results. Preliminary analysis includes visualising
+the allocated organelle and localisation probabilty of each protein to its most probable organelle.
+
+```{r,fig.height=4.5}
+ptsze <- fData(E14TG2aR)$tagm.mcmc.probability
+
+plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation", cex = ptsze,
+       main = "TAGM-MCMC allocations")
+addLegend(E14TG2aR, fcol = "markers",
+          where = "topleft", ncol = 2, cex = 0.6)
+```
+
+We can visualise other summaries of the data including a Monte-Carlo averaged
+Shannon entropy. This is a measure of uncertainty and poteins with greater
+shannon entropy have more uncertainty in their localisation. We observe
+global patterns of uncertainty, particulaly in areas where organelle boundaries
+overlap. There are also regions of low uncertainty indicating little doubt 
+about the localisation of these proteins.
+
+```{r,, fig.height=4.5}
+ptsze2 <- fData(E14TG2aR)$tagm.mcmc.mean.shannon
+
+plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
+       cex = ptsze2,
+       main = "Visualising global uncertainty")
+addLegend(E14TG2aR, fcol = "markers",
+          where = "topleft", ncol = 2, cex = 0.6)
+
+```
+
+We are also interested in the relatonship between localisation probability to
+the most probable class and the Shannon entropy. Eventhough the two quantities
+are evidently correlated there is still consderable spread. Thus it is important
+to based inference not only on localisation probability but also a measure
+of uncertainty for example the Shannon entropy. 
+```{r, fig.height=4.5}
+myColours <- getStockcol()[as.factor(fData(E14TG2aR)$tagm.mcmc.allocation)] 
+plot(ptsze, ptsze2, col = myColours, pch = 19,
+     xlab = "Localisation probability",
+     ylab = "Shannon entropy",
+     main = "Shannon entropy and localisation probability")
+addLegend(E14TG2aR, fcol = "markers",
+          where = "topright", ncol = 2, cex = 0.6)
+```
+
+Aside from global visualisation of the data, we can also interogate each
+individual protein. We can obtain the full posterior distribution of
+localisation probabilities for each protein from the `tagmE14_converged_pooled`
+object. We can use the `plot` generic on the `MCMCParams` object to obtain
+a violin plot of the localisation distribution. Simply providing the name of
+the protein in the second argument produce the plot for that protein. The 
+transcription factor Q62318, also refered to as KAP1, is most probably 
+localised to nucleus-Chomatin
+but also shows some uncertainty, potentially also localising to other comparments.
+The first violin plot visualises this uncertainty. The nucleur localisation 
+sequence targets Q62318 to the nucleus to regulate cellular differentiation 
+and proliferation. Thus, quantifying uncertainty recovers important
+bioligcal processes. Q9WVK4 is a membrane binding protein, as well as being
+involved in intracellular protein transport it regulates localisation to 
+tubular recycling endosome membranes and so it unsurpising that it localisation
+is uncertain, because of its dynamic sub-cellular role.
+
+```{r, warning=FALSE, fig.height=4}
+par(mfrow = c(1,2)) # Create a two figure panel
+plot(tagmE14_converged_pooled, "Q62318")
+plot(tagmE14_converged_pooled, "Q9WVK4")
+```
+
+## Discussion
+
+We have provided a workflow for the Bayesian analysis of spatial proteomics
+using the `pRoloc` and `MSnbase` software. We have demonstrated, in a step
+by step fahsion, the challenges and advantages to taking a Bayesian approach
+to data analysis. We hope this workflow inspires others to create documentation
+for the Bayesian analysis of biolgical data.
