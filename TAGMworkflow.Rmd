@@ -58,6 +58,159 @@ geweke_test <- function(x) {
   return(res)
 }
 
+mcmc_pool_chains <- function(param) {
+  stopifnot(inherits(param, "MCMCParams"))
+
+  param1 <- pRoloc:::chains(param)[[1]]
+
+  n <- param1@n
+  nPool <- param1@n * length(param) # total number of iteration increase
+  KPool <- param1@K  # number of components unchanged
+  NPool <- param1@N # number of proteins doesn't change
+  numChains <- length(param)
+
+  pooled.Component <- matrix(0, nrow = NPool, ncol = nPool)
+  pooled.ComponentProb <- array(0, c(NPool, nPool, KPool ))
+  pooled.Outlier <- matrix(0, nrow = NPool, ncol = nPool)
+  pooled.OutlierProb <- array(0, c(NPool, nPool, 2 ))
+
+  rownames(pooled.Component) <- rownames(param1@Component)
+  rownames(pooled.ComponentProb) <- rownames(param1@ComponentProb)
+  rownames(pooled.Outlier) <- rownames(param1@Outlier)
+  rownames(pooled.OutlierProb) <- rownames(param1@OutlierProb)
+  dimnames(pooled.ComponentProb)[[3]] <- dimnames(param1@ComponentProb)[[3]]
+
+
+  # Calculate basic quantities
+  for (j in seq_len(numChains)) {
+
+    mc <- pRoloc:::chains(param)[[j]]
+    ## Pool chains
+    pooled.Component[, n * (j - 1) + seq.int(n)] <- mc@Component
+    pooled.ComponentProb[, n * (j - 1) + seq.int(n), ] <- mc@ComponentProb
+    pooled.Outlier[, n * (j - 1)+ seq.int(n)] <- mc@Outlier
+    pooled.OutlierProb[, n * (j - 1) + seq.int(n), ] <- mc@OutlierProb
+
+  }
+
+  mk.list <- lapply(param@chains@chains,function(x) x@ComponentParam@mk)
+  lambdak.list <- lapply(param@chains@chains,function(x) x@ComponentParam@lambdak)
+  nuk.list <- lapply(param@chains@chains,function(x) x@ComponentParam@nuk)
+  sk.list <- lapply(param@chains@chains,function(x) x@ComponentParam@sk)
+
+  ## save Component parameters
+  .ComponentParam <- pRoloc:::.ComponentParam(K = KPool, D = param1@ComponentParam@D,
+                                     mk = Reduce("+", mk.list) / length(mk.list),
+                                     lambdak = Reduce("+", lambdak.list) / length(lambdak.list),
+                                     nuk = Reduce("+", nuk.list) / length(nuk.list),
+                                     sk = Reduce("+", sk.list) / length(sk.list))
+  ## apply thinning and burn-in
+  .Component <- pooled.Component
+  .ComponentProb <- pooled.ComponentProb
+  .Outlier <- pooled.Outlier
+  .OutlierProb <- pooled.OutlierProb
+
+  ## make MCMCChain object
+  .MCMCChain <- pRoloc:::.MCMCChain(n = nPool,
+                           K = KPool,
+                           N = NPool,
+                           Component = .Component,
+                           ComponentProb = .ComponentProb,
+                           Outlier = .Outlier,
+                           OutlierProb = .OutlierProb,
+                           ComponentParam = .ComponentParam)
+
+  ## Make MCMCChains with single object
+  .MCMCChains <- pRoloc:::.MCMCChains(chains = list(.MCMCChain))
+
+  ## Make MCMCParams object
+  pRoloc:::.MCMCParams(method = "TAGM.MCMC",
+                       chains = .MCMCChains,
+                       priors = param@priors,
+                       summary = pRoloc:::.MCMCSummary())
+
+}
+
+
+
+##' Helper function to burn n iterations from the front of the chains
+##'
+##' @title MCMC chain burning
+##' @param x A object of class `MCMCParams`
+##' @param n `integer(1)` defining number of iterations to burn.
+##' @return An updated `MCMCParams` object.
+##' @md
+mcmc_burn_chains <- function(x, n) {
+    stopifnot(inherits(x, "MCMCParams"))
+    n <- as.integer(n[1])
+    stopifnot(is.numeric(n))
+    .chain <- pRoloc:::chains(x)[[1]]
+    K <- .chain@K # Number of components
+    N <- .chain@N # Number of Proteins
+    chainlist <-
+        lapply(x@chains@chains, function(chain) {
+            .ComponentParam <- chain@ComponentParam
+            ## Subset MCMC iterations
+            retain <- seq.int(n + 1, chain@n) ## samples to retain
+            ## Check correct number of iterations
+            stopifnot(ncol(chain@Component[, retain]) == (chain@n - n))
+            .Component <- chain@Component[, retain]
+            .ComponentProb <- chain@ComponentProb[, retain, ]
+            .Outlier <- chain@Outlier[, retain]
+            .OutlierProb <- chain@OutlierProb[, retain, ]
+            pRoloc:::.MCMCChain(n = as.integer(chain@n - n),
+                                K = K,
+                                N = N,
+                                Component = .Component,
+                                ComponentProb = .ComponentProb,
+                                Outlier = .Outlier,
+                                OutlierProb = .OutlierProb,
+                                ComponentParam = .ComponentParam)
+        })
+
+    mcmc_chainlist <- pRoloc:::.MCMCChains(chains = chainlist)
+    pRoloc:::.MCMCParams(method = "TAGM.MCMC",
+                         chains = mcmc_chainlist,
+                         priors = x@priors,
+                         summary = pRoloc:::.MCMCSummary())
+}
+
+## Helper function to subsample the chains, known informally as
+## thinning.
+mcmc_thin_chains <- function(x, freq) {
+  stopifnot(inherits(x, "MCMCParams"))
+  .chain <- pRoloc:::chains(x)[[1]]
+  K <- .chain@K # Number of components
+  N <- .chain@N # Number of Proteins
+  nThin <- floor(.chain@n/freq) # Number of iterations after thinning
+  chainlist <-
+    lapply(x@chains@chains, function(chain) {
+      .ComponentParam <- chain@ComponentParam
+      ## Subset MCMC iterations
+      retain <- freq * seq.int(1:nThin) ## samples to retain
+      ## Check correct number of iterations
+      stopifnot(ncol(chain@Component[, retain]) == nThin)
+      .Component <- chain@Component[, retain]
+      .ComponentProb <- chain@ComponentProb[, retain, ]
+      .Outlier <- chain@Outlier[, retain]
+      .OutlierProb <- chain@OutlierProb[, retain, ]
+      pRoloc:::.MCMCChain(n = as.integer(nThin),
+                          K = K,
+                          N = N,
+                          Component = .Component,
+                          ComponentProb = .ComponentProb,
+                          Outlier = .Outlier,
+                          OutlierProb = .OutlierProb,
+                          ComponentParam = .ComponentParam)
+    })
+
+  mcmc_chainlist <- pRoloc:::.MCMCChains(chains = chainlist)
+  pRoloc:::.MCMCParams(method = "TAGM.MCMC",
+                       chains = mcmc_chainlist,
+                       priors = x@priors,
+                       summary = pRoloc:::.MCMCSummary())
+}
+
 ```
 
 
@@ -613,8 +766,8 @@ here and further diagnostics can be perform on any summary of the data.
 
 An important question to consider is whether removing an
 early portion of the chain might lead to improvment of the convergence diagonistics.
-This my particularly relevant if a chain converges some iterations after our
-`burin` specified orginally. For example let us take the first Geweke test
+This my particularly relevant if a chain converges some iterations after our orginally
+specified `burin`. For example let us take the first Geweke test
 above, which suggested chain 3 had not converged and see if discarding the initial
 $10\%$ of the chain improves the statistic. The function below removes $50$ samples
 , informaly known as burning, from the beginning of each chain and the output shows that we now have $450$
@@ -639,25 +792,71 @@ geweke_test(newout)
 ```
 ## Processing converged chains
 
-Having made an assessment of convergence we decide to discard  chains $3,5$ and $6$
-from any furthe analysis. The code chunk below remove these chains and
+Having made an assessment of convergence, we decide to discard  chains $3,5$ and $6$
+from any further analysis. The code chunk below remove these chains and
 creates and new object to store the converged chains.
 
 ```{r,}
-removeChain <- c(3, 5, 6) # The chain removed
+removeChain <- c(3, 5, 6) # The chains to be removed
 tagmE14_converged <- tagmE14[seq_len(nChains)[-removeChain]] # Create new object
 
 ```
 
-We have seen that the `MCMCParams` object can be large and therefore
+The `MCMCParams` object can be large and therefore
 if we have a large number of samples we may want to subsample our chain, informally
 known as thinning to reduce the number of samples. Thinning also has another
 purpose. We may desire indepedent samples from our posterior distribution
 but the MCMC algorithm produces autocorrelated samples. Thinning can be applied
 to reduce the autocorrelation between samples. The code chuck below, which is not
-evaluate demonstrates, retaining every $5^{th}$ iteration
+evaluate demonstrates, retaining every $5^{th}$ iteration. Recall that we 
+we thinned by $20$ when we first ran the MCMC algorithm.
 
 ```{r, eval= FALSE}
 tagmE14_converged_thinned <- mcmc_thin_chains(tagmE14_converged, freq  = 5)
-
 ```
+
+We initially ran $6$ chains and after having made an assesssment of convergence
+we decided to discard $3$ of the chains. We desire to make inference using
+sample from all $3$ chains, since this leads to better posterior estimates.
+In their current class strucutre all the chains are stored separately, so the
+following function pools all sample for all chains together to make a single
+longer chain with all samplers. Pooling a mixture of converged and unconverged
+chains in likely to lead to poor quality results.
+
+```{r,}
+tagmE14_converged_pooled <- mcmc_pool_chains(tagmE14_converged)
+tagmE14_converged_pooled
+tagmE14_converged_pooled[[1]]
+```
+
+To populate the summary slot of the converged and pooled chain, we can use
+the `tagmMcmcProcess` function. As we can see from the object below a summary
+is now available. In information now available in the summary slot was detailed
+in section the previous section. We note that if there is more than $1$ chain
+in the `MCMCParams` object then the chains are automatically pooled 
+to compute the summaries.
+```{r,}
+tagmE14_converged_pooled <- tagmMcmcProcess(tagmE14_converged_pooled)
+tagmE14_converged_pooled
+```
+
+To create new feature columns in the `MSnSet` and appened the summary information,
+we apply the `tagmPredict` function. The `probJoint` argument indicates whether
+or not to add probablistic information for all organelles for all proteins,
+rather than just the information for the most probable organelle. The
+outlier probabilities are also return by default, but users can change this
+using the `probOutlier` argument.
+
+```{r,}
+E14TG2aR <- tagmPredict(object = E14TG2aR,
+                        params = tagmE14_converged_pooled, 
+                        probJoint = TRUE)
+head(fData(E14TG2aR))
+  
+```
+
+
+## Analysis, visualisation and interpreting results
+
+Now that we have singled pooled chain of 
+
