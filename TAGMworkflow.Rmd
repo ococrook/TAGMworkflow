@@ -214,7 +214,7 @@ mcmc_thin_chains <- function(x, freq) {
 ```
 
 
-Quantifying uncertainty in the spatial distribution of proteins allows for novel
+Quantifying uncertainty in the spatial subcellular distribution of proteins allows for novel
 insight into protein function. Many proteins live in a single location
 within the cell, however there are those that reside in mutiple locations and those that
 dynamically relocalise. Functional comparmentalisation of proteins allows the cell to control
@@ -325,7 +325,7 @@ E14TG2aR
 ```
 
 We can visualise the mouse stem cell dataset use the `plot2D` function. We
-observe that some of the organlles classes overlap and this is a typical 
+observe that some of the organelle classes overlap and this is a typical 
 feature of biological datasets. Thus, it is vital to perform
 uncertainty quantification when analysising biological data.
 
@@ -337,7 +337,7 @@ plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data"
 
 We have found that the TAGM model sometimes fails due to floating point arithemtic errors.
 Error messages such at `error: chol(): decomposition failed` are indicative of this issue.
-Though theortically this shouldn't happen and most of the time the issue doesn't appear,
+Though theoretically this shouldn't happen and most of the time the issue doesn't appear,
 it can occur. The failure can happen for a number of reasons such as proteins have almost
 identical profiles; highly correlated or co-linear fractions; and/or all quantitation values
 in a particular fraction are close to zero. We find performing variance stabilsation 
@@ -410,7 +410,7 @@ the log posterior at each iteration and we see the algorithm rapidly plateaus an
 so we have acheived convergence. If convergence has not been reached during this time,
 increase the number of iteration by changing the parameter `numIter` in the `tagmMapTrain`
 method. In practice, it is not unexpected to observe small fluctations due to numerical errors
-and this should not be concerned users.
+and this should not concern users.
 
 ```{r MAPconverge, }
 plot(mapRes@posteriors$logposterior, type = "b", col = "blue", 
@@ -602,7 +602,7 @@ tagmE14
 
 Assessing whether or not an MCMC algorithm has converged is challenging. Assessing
 and diagnosing convergence is an active area of research and throughout the `90s many approaches
-were proposed, (see ...). Converged MCMC algorithm should be oscillating rapidly around
+were proposed, (see ...). A converged MCMC algorithm should be oscillating rapidly around
 a single value with no monotonicity. We provide a more detailed exploration of this issue,
 but the readers should bare in mind that the methods provided below are diagnostics
 and cannot guarantee success. We direct readers to several important works in the
@@ -854,7 +854,8 @@ E14TG2aR <- tagmPredict(object = E14TG2aR,
 head(fData(E14TG2aR))
   
 ```
-## Aside: *Priors*
+# Aside: *Priors*
+
 
 
 
@@ -933,6 +934,6 @@ plot(tagmE14_converged_pooled, "Q9WVK4")
 
 We have provided a workflow for the Bayesian analysis of spatial proteomics
 using the `pRoloc` and `MSnbase` software. We have demonstrated, in a step
-by step fahsion, the challenges and advantages to taking a Bayesian approach
+by step fashion, the challenges and advantages to taking a Bayesian approach
 to data analysis. We hope this workflow inspires others to create documentation
 for the Bayesian analysis of biolgical data.
