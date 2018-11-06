@@ -10,6 +10,7 @@ output: pdf_document
 #   toc_float: true
 ---
 
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
 
 # Version
   <p>
@@ -856,16 +857,18 @@ head(fData(E14TG2aR))
 ```
 # Aside: *Priors*
 
-Bayesian analysis requires users to specify a prior information about the parameters.
-This potentially appears an impossible task; however, good default options 
+Bayesian analysis requires users to specify prior information about the parameters.
+This potentially appears a challenging task; however, good default options 
 are often possible. Should expert information be available for any of these
-priors then the users should provide this, else we have found that the 
-following default choices work well in practice. The priors also provide
+priors then the users should provide this, else we have found that the
+default choices work well in practice. The priors also provide
 regularisation and shrinkage to avoid overfitting. Given enough data the 
 likelihood overhelms the prior and little inference is based on the prior.
+There is little guidance in the literature on how to choose priors or even
+what they mean for the data analysis.
 
-A normal inverse-Wishart prior is place on the normally distributed
-mixture components. The normal inverse-wishart prior has $4$ hyperparameters
+We place a normal inverse-Wishart prior on the normally distributed
+mixture components. The normal inverse-Wishart prior has $4$ hyperparameters
 to be chosen to specify the prior beliefs in the mean and covariance of these
 mixtures. These are the prior mean `mu0` expressing the prior location of each
 organelle; a prior shrinkage `lambda0` a scaler expressing uncertainty in the
@@ -873,7 +876,28 @@ prior mean; the prior degress of freedom `nu0` and a scale prior `S0` on the cov
 Together `nu0` and `S0` specify the prior variability on organelle covariances.
 All components share the same prior information. 
 
-
+The default options for these hold little information and are based on 
+choice recommended by . The prior mean `mu0` is set to mean of the data.
+`lambda0` is set to be $0.01$ meaning some uncertainty in the covariance is
+propograted to the mean, increasing `lambda0` increase shrinkage towards the
+prior. `nu0` is set to the number of feature variables plus
+$2$, which is the smallest integer value that ensure a finite covariance matrix.
+The prior scale matrix $S0$ is set to
+\begin{equation}
+S0 = \frac{\diag(\frac{1}{n}\sum (X - \bar{X})^2)}{K^{1/D}},
+\end{equation}
+and represents a diffuse prior on the covariance. Another good choice
+which is often used is a constant multiple of the identity matrix. The prior
+for the Dirichlet disctribution concentration paramters `\beta0` is set to $1$
+for each organelle. This represents a symmetric belief about the number of proteins
+allocated to each organelle. Another reasonable choice would be the non-informative
+Jeffery's prior for the dirichlet, which sets `\beta0` is $0.5$ for each organelle.
+The prior weight for the outlier detection class is a $\mathcal{B}(u, v)$ distribution.
+The default for $u = 2$ and the default for $v = 10$. This represent the reasonable
+belief that $\frac{u}{u + v} = \frac{1}{6}$ proteins \textit{a prior} might be an
+outlier and we believe is unlikely that more than $50\%$ of proteins are outliers. Decreasing
+the value of $v$, represent more uncertainty about the number of protein that
+are outliers.
 
 ## Analysis, visualisation and interpretation of results
 
