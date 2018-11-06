@@ -217,17 +217,17 @@ mcmc_thin_chains <- function(x, freq) {
 
 
 Quantifying uncertainty in the spatial subcellular distribution of proteins allows for novel
-insight into protein function. Many proteins live in a single location
+insight into protein function [@Crook:2018]. Many proteins live in a single location
 within the cell, however there are those that reside in mutiple locations and those that
-dynamically relocalise. Functional comparmentalisation of proteins allows the cell to control
+dynamically relocalise [@Thul:2017]. Functional comparmentalisation of proteins allows the cell to control
 biomolecular pathways and biochemical process within the cell. Therefore, proteins
-with multiple localisation may have mutiple functional roles. Machine learning algorithms
+with multiple localisation may have mutiple functional roles [@Jeffery:2009]. Machine learning algorithms
 that fail to quantify uncertainty are unable to draw deeper insight into understanding
 cell biology from mass-spectrometry (MS) based spatial proteomics experiments.
 
 Bayesian approaches to machine learning and statistical analysis can provide 
 more insight into the data, since uncertainty quantification arises as a consequence
-of a generative model for the data. In a Bayesian framework, a model
+of a generative model for the data [@Gelman:1995]. In a Bayesian framework, a model
 with paramters for the data is proposed, along with a statement about our prior 
 beliefs of the model paramters. Bayes' theorem tells us how to update the prior 
 distribution of the parameters to obtain the posterior
@@ -261,7 +261,7 @@ model proposed in:
 The above manuscript provides a detailed description of the model, rigorous comparisons
 and testing on many spatial proteomics datasets and a case study on 
 a hyperLOPIT experiment on mouse pluripotent stem
-cells. Revisiting these details is not the purpose of this computational protocol, rather
+cells [@hyper, @Mulvey:2017]. Revisiting these details is not the purpose of this computational protocol, rather
 we present how to correctly use the software and provide step by step guidance
 for interpreting the results.
 
@@ -276,7 +276,7 @@ To perform inference in the TAGM model there are two approaches. The first,
 which we refer to as TAGM-MAP, allows 
 us to obtain *maximum a posteriori* estimates of posterior localisation 
 probabilities; that is, the modal posterior probability that a protein localises to that class.
-This approach uses the expectation-maximisation (EM) algorithm to perform inference.
+This approach uses the expectation-maximisation (EM) algorithm to perform inference [@EM:1977].
 Whilst this is a interpretable summary of the TAGM model, it only provides
 point estimates.  For a richer analysis, we present a Markov-chain Monte-Carlo (MCMC) method to perform 
 fully Bayesian inference in our model, allowing us to obtain full posterior localisation distributions.
@@ -296,7 +296,8 @@ with some remarks and directions for the future.
 # Getting started and infrastructure
 
 In this workflow, we are currently using the development version of `pRoloc` 
-and the current Bioconductor version of `pRolocdata` and `MSnbase`. 
+[@pRoloc:2014] and the current Bioconductor version of `pRolocdata` and `MSnbase`
+[@MSnbase:2012]. 
 The pacakge `pRoloc` contains algorithms and methods for analysing
 spatial proteomics data, building on the `MSnSet` structure provided in `MSnbase`. 
 The `pRolocdata` package provides many annotated datasets from a variety 
@@ -311,12 +312,14 @@ require(pRolocdata)
 
 We assume that we have a MS-based spatial proteomics dataset contained in a `MSnSet`
 structure. For information on how to import data, perform basic data processing,
-quality control, supervised machine learning and transfer learning see Lisa's workflow.
-We use a spatial proteomics dataset on Mouse E14TG2a embryonic stem cells. 
-The LOPIT protocol was used and normalised intensity of proteins from eight iTRAQ 8-plex
+quality control, supervised machine learning and transfer learning see following
+workflow [@Breckels:2016b].
+We use a spatial proteomics dataset on Mouse E14TG2a embryonic stem cells [@Breckels:2013]. 
+The LOPIT protocol [Dunkley:2004; @Dunkley:2006] was used and normalised intensity of proteins from eight iTRAQ 8-plex
 labelled fraction are provided. The methods provided here are independent of labelling procedure, fractionation
-process or workflow. Examples of valid experimental protocols are LOPIT, hyperLOPIT, label-free methods
-such as PCP, and when fractionation is perform by differential centrifugation.
+process or workflow. Examples of valid experimental protocols are LOPIT [@Dunkley:2004], hyperLOPIT
+[@hyper, @Mulvey:2017], label-free methods
+such as PCP [@Foster:2006], and when fractionation is perform by differential centrifugation [@DC:2018].
 
 In the code chunk below, we load the aforementioned dataset. The printout demonstrates
 that this experiment quantified 2031 proteins over 8 fractions.
@@ -343,7 +346,7 @@ Though theoretically this shouldn't happen and most of the time the issue doesn'
 it can occur. The failure can happen for a number of reasons such as proteins have almost
 identical profiles; highly correlated or co-linear fractions; and/or all quantitation values
 in a particular fraction are close to zero. We find performing variance stabilsation 
-normalisation (vsn) can reduce the chances of numerical issues. The following code
+normalisation (vsn) can reduce the chances of numerical issues [@Huber:2002]. The following code
 chunk demonstrates performing this normalisation within R. Though this step is not
 always necessary and if you experience no such issues then you should skip this step.
 
@@ -405,7 +408,7 @@ plotEllipse(E14TG2aR,
 
 The EM algorithm is iterative; that is, the algorithm iterates between
 an expectation step and a maximisation step until the value of the log-posterior
-does not change. This fact can be used to assess the convergence of the EM
+does not change [@EM:1977]. This fact can be used to assess the convergence of the EM
 algoritm. The value of the log-posterior at each iteration is contained within
 the `posteriors` slot within the `MAPParams` object. The code chuck below plots
 the log posterior at each iteration and we see the algorithm rapidly plateaus and
@@ -469,7 +472,7 @@ it is limited in that it can only provide point estimates of the posterior
 localisation distributions. To obtain the full posterior distributions
 and therefore a rich analysis of the data,
 we resort to using Markov-Chain Monte-Carlo methods. 
-In our particular case, we use a so-called collapsed Gibbs sampler.
+In our particular case, we use a so-called collapsed Gibbs sampler [@Smith:1993].
 
 # Methods: *TAGM MCMC* a brief overview
 
@@ -485,13 +488,13 @@ inference constrasts with MAP based inference in that in produces \textit{sample
 from the posterior distribution of localisation probabilities. Hence, we do not
 just have a single estimate for each quantity but a distribution
 (or histogram) of estimates. MCMC methods are a large class of algorithms used to sample from 
-a probability distribution, in our case the posterior distribution of the parameters.
+a probability distribution, in our case the posterior distribution of the parameters [@Gilks:1995].
 They design a Markov-chain; that is, a random sequence of events where the 
 probability of the next event only depends on the current state, which, after
 convergence obtains samples form the posterior distribution. A specific
 example of an MCMC algorithm is the Gibbs sampler, which can be applied when
-the parameters are conditionally conjugate. Often one can perform Rao-Blackwellisation,
-a method to reduce posterior variance, to obtain a collapsed Gibbs sampler.
+the parameters are conditionally conjugate. Often one can perform Rao-Blackwellisation ,
+a method to reduce posterior variance, to obtain a collapsed Gibbs sampler [@Casella:1996].
 Once one has obtained samples from the posterior distribution, we can estimate the
 true mean of the posterior distribution by simply taking the mean of the samples.
 In a similar fashion, we can obtain other summaries of the posterior distribution.
@@ -603,8 +606,8 @@ tagmE14
 ## Data exploration and convergence diagnostics
 
 Assessing whether or not an MCMC algorithm has converged is challenging. Assessing
-and diagnosing convergence is an active area of research and throughout the `90s many approaches
-were proposed, (see ...). A converged MCMC algorithm should be oscillating rapidly around
+and diagnosing convergence is an active area of research and throughout the 1990s many approaches
+were proposed [Geweke:1992, Gelman:1992; Roberts:1994; Brooks:1998]. A converged MCMC algorithm should be oscillating rapidly around
 a single value with no monotonicity. We provide a more detailed exploration of this issue,
 but the readers should bare in mind that the methods provided below are diagnostics
 and cannot guarantee success. We direct readers to several important works in the
@@ -675,7 +678,7 @@ reports the $95\%$ upper confidence interval of the $\hat{R}$
 statistic. In this case ,our samples are not normally distributed.
 The *[coda](https://CRAN.R-project.org/package=coda)* package allows for transformations
 to improve normality of the data, in our case a log tranform is performed.
-The original paper (cite) suggests that chains with $\hat{R}$ value of 
+@Gelman:1992 suggests that chains with $\hat{R}$ value of 
 less than 1.2 are likely to have converged.
 
 ```{r,}
@@ -878,7 +881,7 @@ Together `nu0` and `S0` specify the prior variability on organelle covariances.
 All components share the same prior information. 
 
 The default options for these hold little information and are based on 
-choice recommended by . The prior mean `mu0` is set to mean of the data.
+choice recommended by [@Fraley:2005]. The prior mean `mu0` is set to mean of the data.
 `lambda0` is set to be $0.01$ meaning some uncertainty in the covariance is
 propograted to the mean, increasing `lambda0` increase shrinkage towards the
 prior. `nu0` is set to the number of feature variables plus
@@ -978,3 +981,5 @@ using the `pRoloc` and `MSnbase` software. We have demonstrated, in a step
 by step fashion, the challenges and advantages to taking a Bayesian approach
 to data analysis. We hope this workflow inspires others to create documentation
 for the Bayesian analysis of biolgical data.
+
+# Reference
