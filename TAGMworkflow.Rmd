@@ -657,10 +657,10 @@ summary(out[[1]])
 ```
 ### Applying the Gelman diagnostic
 
-Thus far, our analysis appears promising. Each chain oscillate around an
+Thus far, our analysis appears promising. Each chain oscillates around an
 average of 2.5 outliers and there is no observed monotonicity in our
 output. However, for a more rigorous and unbiased analysis of
-convergence we can calculate the Gelman diagnostics using the
+convergence we can calculate the Gelman diagnostic using the
 *[coda](https://CRAN.R-project.org/package=coda)* package
 [@Gelman:1992,@Brooks:1998]. This statistics is often refered to as
 $\hat{R}$ or the potential scale reduction factor. The idea of the
@@ -679,7 +679,7 @@ less than 1.2 are likely to have converged.
 ```{r,}
 ## We can check Gelman diagnostic for convergence 
 ## (values less than <1.2  are good for convergence)
-gelman.diag(out, transform = TRUE) ## the Upper C.I. is 1.03 so mcmc has likely converged
+gelman.diag(out, transform = TRUE) # the Upper C.I. is 1.03 so mcmc has likely converged
 ```
 We can also look at the Gelman diagnostics statistics for groups or pairs
 of chains. The first line below compute the Gelman diagnostic across
@@ -716,7 +716,7 @@ slightly different values, this raises suspicion that some of the chains may not
 For example chains $1,2$ and $4$ appear to oscillate around a mean value of $6.1$. Chains $3$ and
 $5$ appear to increase and decrease rather than rapidly osclate. Chain $5$ seems to be 
 oscillating around $5.7$, which is not in consensus with the other chains.
-For a more quantitaive analysis, we again apply the Gelamn diagnostics to these summaries.
+For a more quantitaive analysis, we again apply the Gelman diagnostics to these summaries.
 ```{r,}
 gelman.diag(meanAlloc)
 ```
@@ -766,7 +766,7 @@ here and further diagnostics can be perform on any summary of the data.
 
 An important question to consider is whether removing an
 early portion of the chain might lead to improvment of the convergence diagonistics.
-This my particularly relevant if a chain converges some iterations after our orginally
+This might be particularly relevant if a chain converges some iterations after our orginally
 specified `burin`. For example let us take the first Geweke test
 above, which suggested chain 3 had not converged and see if discarding the initial
 $10\%$ of the chain improves the statistic. The function below removes $50$ samples
@@ -804,11 +804,11 @@ tagmE14_converged <- tagmE14[seq_len(nChains)[-removeChain]] # Create new object
 
 The `MCMCParams` object can be large and therefore
 if we have a large number of samples we may want to subsample our chain, informally
-known as thinning to reduce the number of samples. Thinning also has another
+known as thinning, to reduce the number of samples. Thinning also has another
 purpose. We may desire indepedent samples from our posterior distribution
 but the MCMC algorithm produces autocorrelated samples. Thinning can be applied
 to reduce the autocorrelation between samples. The code chuck below, which is not
-evaluate demonstrates, retaining every $5^{th}$ iteration. Recall that we 
+evaluate demonstrates retaining every $5^{th}$ iteration. Recall that we 
 we thinned by $20$ when we first ran the MCMC algorithm.
 
 ```{r, eval= FALSE}
@@ -856,6 +856,22 @@ head(fData(E14TG2aR))
 ```
 # Aside: *Priors*
 
+Bayesian analysis requires users to specify a prior information about the parameters.
+This potentially appears an impossible task; however, good default options 
+are often possible. Should expert information be available for any of these
+priors then the users should provide this, else we have found that the 
+following default choices work well in practice. The priors also provide
+regularisation and shrinkage to avoid overfitting. Given enough data the 
+likelihood overhelms the prior and little inference is based on the prior.
+
+A normal inverse-Wishart prior is place on the normally distributed
+mixture components. The normal inverse-wishart prior has $4$ hyperparameters
+to be chosen to specify the prior beliefs in the mean and covariance of these
+mixtures. These are the prior mean `mu0` expressing the prior location of each
+organelle; a prior shrinkage `lambda0` a scaler expressing uncertainty in the
+prior mean; the prior degress of freedom `nu0` and a scale prior `S0` on the covariance.
+Together `nu0` and `S0` specify the prior variability on organelle covariances.
+All components share the same prior information. 
 
 
 
