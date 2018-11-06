@@ -3,6 +3,7 @@ title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
 author:
 - Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
 package: pRoloc
+bibliography: BayesProt.bib
 output: pdf_document
 
 #output:
@@ -855,7 +856,7 @@ E14TG2aR <- tagmPredict(object = E14TG2aR,
 head(fData(E14TG2aR))
   
 ```
-# Aside: *Priors*
+### Aside: *Priors*
 
 Bayesian analysis requires users to specify prior information about the parameters.
 This potentially appears a challenging task; however, good default options 
@@ -881,17 +882,17 @@ choice recommended by . The prior mean `mu0` is set to mean of the data.
 `lambda0` is set to be $0.01$ meaning some uncertainty in the covariance is
 propograted to the mean, increasing `lambda0` increase shrinkage towards the
 prior. `nu0` is set to the number of feature variables plus
-$2$, which is the smallest integer value that ensure a finite covariance matrix.
+$2$, which is the smallest integer value that ensures a finite covariance matrix.
 The prior scale matrix $S0$ is set to
 \begin{equation}
-S0 = \frac{\diag(\frac{1}{n}\sum (X - \bar{X})^2)}{K^{1/D}},
+S_0 = \frac{\diag(\frac{1}{n}\sum (X - \bar{X})^2)}{K^{1/D}},
 \end{equation}
 and represents a diffuse prior on the covariance. Another good choice
 which is often used is a constant multiple of the identity matrix. The prior
-for the Dirichlet disctribution concentration paramters `\beta0` is set to $1$
+for the Dirichlet distribution concentration paramters `beta0` is set to $1$
 for each organelle. This represents a symmetric belief about the number of proteins
 allocated to each organelle. Another reasonable choice would be the non-informative
-Jeffery's prior for the dirichlet, which sets `\beta0` is $0.5$ for each organelle.
+Jeffery's prior for the Dirichlet hyperparameter, which sets `beta0` is $0.5$ for each organelle.
 The prior weight for the outlier detection class is a $\mathcal{B}(u, v)$ distribution.
 The default for $u = 2$ and the default for $v = 10$. This represent the reasonable
 belief that $\frac{u}{u + v} = \frac{1}{6}$ proteins \textit{a prior} might be an
