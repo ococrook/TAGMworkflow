@@ -22,7 +22,7 @@ output: pdf_document
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
 require(pRoloc)
-stopifnot(packageVersion("pRoloc") >= '1.23.1')
+stopifnot(packageVersion("pRoloc") >= '1.23.2')
 
 require(coda)
 setStockcol(NULL)
@@ -117,11 +117,13 @@ spatial proteomics data, building on the `MSnSet` structure provided in `MSnbase
 The `pRolocdata` package provides many annotated datasets from a variety
 of species and experimental procedures. The following code chunk installs the
 software suite of packages require for analysis.
+
 ```{r, message= FALSE}
-# require(devtools)
-#install_github("lgatto/pRoloc")
-#BiocManager::install(c("MSnbase", "pRolocdata"))
-require(pRolocdata)
+if (!require("BiocManager")
+    install.package("BiocManager")
+BiocManager::install(c("pRoloc", "pRolocdata"))
+library("pRoloc")
+library("pRolocdata")
 ```
 
 We assume that we have a MS-based spatial proteomics dataset contained in a `MSnSet`
@@ -148,7 +150,7 @@ observe that some of the organelle classes overlap and this is a typical
 feature of biological datasets. Thus, it is vital to perform
 uncertainty quantification when analysising biological data.
 
-```{r,}
+```{r e14pca1, fig.width = 7, fig.height = 7}
 plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data")
 ```
 
@@ -164,19 +166,20 @@ normalisation (vsn) can reduce the chances of numerical issues [@Huber:2002]. Th
 chunk demonstrates performing this normalisation within R. Though this step is not
 always necessary and if you experience no such issues then you should skip this step.
 
-```{r,}
+```{r vsnnorm}
 E14TG2aR <- normalise(E14TG2aR, "vsn")
 ```
 
 We can visualise the results again by using `plot2D`
 
-```{r,}
+```{r e14pca2, fig.width = 7, fig.height = 7}
 plot2D(E14TG2aR,
        main = "PCA of mouse stem cell data after normalisation")
 
 ```
 
 \newpage
+
 # Methods: *TAGM MAP*
 
 ## Introduction to TAGM MAP
@@ -209,7 +212,7 @@ The code chunk below plots the probability ellipses along the first and second,
 as well as the fourth prinipal component. The user
 can change the components visualised by altering the `dims` argument.
 
-```{r plotEllipse, fig.width= 8, fig.height=10}
+```{r plotEllipse, fig.width = 8, fig.height = 16}
 par(mfrow = c(2, 1)) ## Create two panels
 plotEllipse(E14TG2aR, mapRes, main = "PCA plot with probability ellipses")
 plotEllipse(E14TG2aR,
@@ -231,7 +234,7 @@ increase the number of iteration by changing the parameter `numIter` in the `tag
 method. In practice, it is not unexpected to observe small fluctations due to numerical errors
 and this should not concern users.
 
-```{r MAPconverge, }
+```{r MAPconverge}
 plot(mapRes@posteriors$logposterior, type = "b", col = "blue",
      cex = 0.1, ylab = "log-posterior", xlab = "iteration",
      main = "log-posterior at each iteration of the EM algorithm")
@@ -274,7 +277,7 @@ localisation probabilities. To do this we extract the MAP localisation
 probabilities from the feature columns of the the `MSnSet` and pass these
 to the `plot2D` function.
 
-```{r mapPlotting, fig.height=4.3}
+```{r mapPlotting, fig.height = 7, fig.width = 7}
 ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
 
 plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze,
@@ -630,7 +633,7 @@ to reduce the autocorrelation between samples. The code chuck below, which is no
 evaluate demonstrates retaining every $5^{th}$ iteration. Recall that we
 we thinned by $20$ when we first ran the MCMC algorithm.
 
-```{r, eval= FALSE}
+```{r, eval = FALSE}
 tagmE14_converged_thinned <- mcmc_thin_chains(tagmE14_converged, freq  = 5)
 ```
 
@@ -723,7 +726,7 @@ Now that we have single pooled chain of samples from a converged MCMC algorithm,
 we can begin to analyse the results. Preliminary analysis includes visualising
 the allocated organelle and localisation probabilty of each protein to its most probable organelle.
 
-```{r,fig.height=4.5}
+```{r, fig.height = 7, fig.width = 7}
 ptsze <- fData(E14TG2aR)$tagm.mcmc.probability
 
 plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation", cex = ptsze,
@@ -739,7 +742,7 @@ global patterns of uncertainty, particulaly in areas where organelle boundaries
 overlap. There are also regions of low uncertainty indicating little doubt
 about the localisation of these proteins.
 
-```{r,, fig.height=4.5}
+```{r, fig.height = 7, fig.width = 7}
 ptsze2 <- fData(E14TG2aR)$tagm.mcmc.mean.shannon
 
 plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
