@@ -13,7 +13,7 @@ output: pdf_document
 
 \newcommand{\diag}{\mathop{\mathrm{diag}}}
 
-# Version
+# Versions
 -  **R**: `r R.version.string`
 -  **Bioconductor**: `r BiocManager::version()`
 - **pRoloc** `r packageVersion("pRoloc")`
@@ -71,19 +71,14 @@ presented here, but provides a template for others to design tools
 using Bayesian methodology for the biological community.
 
 Our model for the data is the t-augmented Gaussian mixture (TAGM)
-model proposed in:
-
-> A Bayesian Mixture Modelling Approach For Spatial Proteomics Oliver
-> M Crook, Claire M Mulvey, Paul D. W. Kirk, Kathryn S Lilley, Laurent
-> Gatto bioRxiv 282269; doi: https://doi.org/10.1101/282269
-
-The above manuscript provides a detailed description of the model,
-rigorous comparisons and testing on many spatial proteomics datasets
-and a case study on a hyperLOPIT experiment on mouse pluripotent stem
-cells [@hyper, @Mulvey:2017]. Revisiting these details is not the
-purpose of this computational protocol, rather we present how to
-correctly use the software and provide step by step guidance for
-interpreting the results.
+model proposed in [@Crook:2018]. @Crook:2018 provide a detailed
+description of the model, rigorous comparisons and testing on many
+spatial proteomics datasets and a case study on a hyperLOPIT
+experiment on mouse pluripotent stem cells
+[@hyper;@Mulvey:2017]. Revisiting these details is not the purpose of
+this computational protocol, rather we present how to correctly use
+the software and provide step by step guidance for interpreting the
+results.
 
 In brief, the TAGM model posits that each annotated sub-cellular niche
 can be described by a Gaussian distribution.  Thus the full complement
@@ -107,7 +102,7 @@ obtain full posterior localisation distributions.  This method is
 refered to as TAGM-MCMC throughout the text.
 
 This workflow begins with a brief review of some of the basic features
-of mass-spectrometry based spatial proteomics data, including the
+of mass spectrometry-based spatial proteomics data, including the
 state-of-the-art computational infrastructure and bespoke software
 suite.  We then present each method in turn, detailing how to obtain
 high quality results. We provide an extended dicussion of the
@@ -120,14 +115,14 @@ and directions for the future.
 
 # Getting started and infrastructure
 
-In this workflow, we are currently using the development version of
-`pRoloc` [@pRoloc:2014] and the current Bioconductor version of
-`pRolocdata` and `MSnbase` [@MSnbase:2012].  The pacakge `pRoloc`
-contains algorithms and methods for analysing spatial proteomics data,
-building on the `MSnSet` structure provided in `MSnbase`.  The
-`pRolocdata` package provides many annotated datasets from a variety
-of species and experimental procedures. The following code chunk
-installs the software suite of packages require for analysis.
+In this workflow, we are currently using version 1.23.2 of `pRoloc`
+[@pRoloc:2014].  The pacakge `pRoloc` contains algorithms and methods
+for analysing spatial proteomics data, building on the `MSnSet`
+structure provided in `MSnbase`.  The `pRolocdata` package provides
+many annotated datasets from a variety of species and experimental
+procedures. The following code chunks install and load the suite of
+packages require for the analysis.
+
 
 ```{r install,eval = FALSE}
 if (!require("BiocManager"))
@@ -144,13 +139,13 @@ We assume that we have a MS-based spatial proteomics dataset contained
 in a `MSnSet` structure. For information on how to import data,
 perform basic data processing, quality control, supervised machine
 learning and transfer learning see following workflow
-[@Breckels:2016b].  We use a spatial proteomics dataset on Mouse
+[@Breckels:2016b]. We use a spatial proteomics dataset on mouse
 E14TG2a embryonic stem cells [@Breckels:2013].  The LOPIT protocol
-[Dunkley:2004; @Dunkley:2006] was used and normalised intensity of
+[@Dunkley:2004;@Dunkley:2006] was used and normalised intensity of
 proteins from eight iTRAQ 8-plex labelled fraction are provided. The
 methods provided here are independent of labelling procedure,
 fractionation process or workflow. Examples of valid experimental
-protocols are LOPIT [@Dunkley:2004], hyperLOPIT [@hyper,@Mulvey:2017],
+protocols are LOPIT [@Dunkley:2004], hyperLOPIT [@hyper;@Mulvey:2017],
 label-free methods such as PCP [@Foster:2006], and when fractionation
 is perform by differential centrifugation [@DC:2018].
 
@@ -158,7 +153,7 @@ In the code chunk below, we load the aforementioned dataset. The
 printout demonstrates that this experiment quantified 2031 proteins
 over 8 fractions.
 
-```{r,}
+```{r loade14data}
 data("E14TG2aR") # load experimental data
 E14TG2aR
 ```
@@ -538,7 +533,7 @@ an average of 2.5 outliers and there is no observed monotonicity in
 our output. However, for a more rigorous and unbiased analysis of
 convergence we can calculate the Gelman diagnostic using the
 *[coda](https://CRAN.R-project.org/package=coda)* package
-[@Gelman:1992,@Brooks:1998]. This statistics is often refered to as
+[@Gelman:1992;@Brooks:1998]. This statistics is often refered to as
 $\hat{R}$ or the potential scale reduction factor. The idea of the
 Gelman diagnostics is to compare the inter and intra chain
 variances. The ratio of these quantities should be close to one.  The
@@ -737,7 +732,8 @@ is now available. In information now available in the summary slot was detailed
 in section the previous section. We note that if there is more than $1$ chain
 in the `MCMCParams` object then the chains are automatically pooled
 to compute the summaries.
-```{r,}
+
+```{r tagmprocess}
 tagmE14_converged_pooled <- tagmMcmcProcess(tagmE14_converged_pooled)
 tagmE14_converged_pooled
 ```
@@ -895,5 +891,18 @@ demonstrated, in a step by step fashion, the challenges and advantages
 to taking a Bayesian approach to data analysis. We hope this workflow
 inspires others to create documentation for the Bayesian analysis of
 biolgical data.
+
+# Session information
+
+Below, we provide a summary of all packages and versions used to
+generate this document.
+
+```{r si}
+sessionInfo()
+```
+
+The source of this document, including the code necessary to reproduce
+the analyses and figures is available in a public manuscript
+repository on GitHub~\cite{ghrepo}.
 
 # Reference
