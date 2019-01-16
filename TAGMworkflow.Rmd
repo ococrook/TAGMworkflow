@@ -243,21 +243,22 @@ The EM algorithm is iterative; that is, the algorithm iterates between
 an expectation step and a maximisation step until the value of the
 log-posterior does not change [@EM:1977]. This fact can be used to
 assess the convergence of the EM algoritm. The value of the
-log-posterior at each iteration is contained within the `posteriors`
-slot within the `MAPParams` object. The code chuck below plots the log
-posterior at each iteration and we see the algorithm rapidly plateaus
-and so we have acheived convergence. If convergence has not been
-reached during this time, increase the number of iteration by changing
-the parameter `numIter` in the `tagmMapTrain` method. In practice, it
-is not unexpected to observe small fluctations due to numerical errors
-and this should not concern users.
+log-posterior at each iteration can be accessed with the
+`logPosteriors` function on the `MAPParams` object. The code chuck
+below plots the log posterior at each iteration and we see on figure
+\@ref(fig:mapconverge) the algorithm rapidly plateaus and so we have
+acheived convergence. If convergence has not been reached during this
+time, increase the number of iteration by changing the parameter
+`numIter` in the `tagmMapTrain` method. In practice, it is not
+unexpected to observe small fluctations due to numerical errors and
+this should not concern users.
 
-```{r MAPconverge}
-plot(mappars@posteriors$logposterior, type = "b", col = "blue",
-     cex = 0.1, ylab = "log-posterior", xlab = "iteration",
-     main = "log-posterior at each iteration of the EM algorithm")
+```{r mapconverge, fig.width = 6, fig.height = 4, fig.cap = "Log-posterior at each iteration of the EM algorithm demonstrating convergence."}
+plot(logPosteriors(mappars), type = "b", col = "blue",
+     cex = 0.3, ylab = "log-posterior", xlab = "iteration")
 
 ```
+
 The code chuck below uses the `MAPParams` object to classify the
 proteins of unknown localisation using `tagmPredict` function. This
 method appends new columns to the `fData` columns of the `MSnSet`.
@@ -293,13 +294,12 @@ summary(fData(E14TG2aR)$tagm.map.outlier)
 We can visualise the results by scaling the pointer according the
 posterior localisation probabilities. To do this we extract the MAP
 localisation probabilities from the feature columns of the the
-`MSnSet` and pass these to the `plot2D` function.
+`MSnSet` and pass these to the `plot2D` function (figure \@ref(fig:mappca)).
 
-```{r mapPlotting, fig.height = 7, fig.width = 7}
+```{r mappca, fig.height = 5, fig.width = 5, fig.cap = "TAGM MAP allocations"}
 ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
-
-plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze,
-       main = "TAGM MAP allocations")
+plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
+addLegend(E14TG2aR, where = "topleft", cex = 0.6, fcol = "tagm.map.allocation")
 ```
 
 The TAGM MAP method is easy to use and it is simple to check
