@@ -165,31 +165,30 @@ organelle classes overlap and this is a typical feature of biological
 datasets. Thus, it is vital to perform uncertainty quantification when
 analysising biological data.
 
-## Aside: normalisation
+<!-- ## Aside: normalisation -->
 
-We have found that the TAGM model sometimes fails due to floating
-point arithemtic errors.  Error messages such at `error: chol():
-decomposition failed` are indicative of this issue.  Though
-theoretically this shouldn't happen and most of the time the issue
-doesn't appear, it can occur. The failure can happen for a number of
-reasons such as proteins have almost identical profiles; highly
-correlated or co-linear fractions; and/or all quantitation values in a
-particular fraction are close to zero. We find performing variance
-stabilsation normalisation (vsn) [@Huber:2002] can reduce the chances
-of numerical issues. The following code chunk demonstrates performing
-this normalisation within R and the result is visualise on figure
-\@ref(fig:e14pca1) (right). Though this step is not always necessary
-and if you experience no such issues then you should skip this step.
+<!-- We have found that the TAGM model sometimes fails due to floating -->
+<!-- point arithemtic errors.  Error messages such at `error: chol(): -->
+<!-- decomposition failed` are indicative of this issue.  Though -->
+<!-- theoretically this shouldn't happen and most of the time the issue -->
+<!-- doesn't appear, it can occur. The failure can happen for a number of -->
+<!-- reasons such as proteins have almost identical profiles; highly -->
+<!-- correlated or co-linear fractions; and/or all quantitation values in a -->
+<!-- particular fraction are close to zero. We find performing variance -->
+<!-- stabilsation normalisation (vsn) [@Huber:2002] can reduce the chances -->
+<!-- of numerical issues. The following code chunk demonstrates performing -->
+<!-- this normalisation within R and the result is visualise on figure -->
+<!-- \@ref(fig:e14pca1) (right). Though this step is not always necessary -->
+<!-- and if you experience no such issues then you should skip this step. -->
 
-```{r vsnnorm, message = FALSE}
-E14TG2aRn <- normalise(E14TG2aR, "vsn")
-```
+<!-- ```{r vsnnorm, message = FALSE} -->
+<!-- E14TG2aRn <- normalise(E14TG2aR, "vsn") -->
+<!-- ``` -->
 
-```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data before (left) and after (right) normalisation..", fig.width = 10, fig.height = 5}
-par(mfrow = c(1, 2))
+
+```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data.", fig.width = 5, fig.height = 5}
 plot2D(E14TG2aR)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6)
-plot2D(E14TG2aRn)
 ```
 
 \newpage
@@ -221,6 +220,9 @@ set.seed(2)
 mappars <- tagmMapTrain(E14TG2aR)
 mappars
 ```
+
+**TODO** Add a note on co-linearity of data.
+
 The results of the modelling can be visualised with the `plotEllipse`
 function on figure \@ref(fig:e14ellipse). The outer ellipse contains
 99% of the total probability whilst the middle and inner ellipses
