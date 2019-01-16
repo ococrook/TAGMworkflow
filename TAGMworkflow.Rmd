@@ -165,31 +165,30 @@ organelle classes overlap and this is a typical feature of biological
 datasets. Thus, it is vital to perform uncertainty quantification when
 analysising biological data.
 
-## Aside: normalisation
+<!-- ## Aside: normalisation -->
 
-We have found that the TAGM model sometimes fails due to floating
-point arithemtic errors.  Error messages such at `error: chol():
-decomposition failed` are indicative of this issue.  Though
-theoretically this shouldn't happen and most of the time the issue
-doesn't appear, it can occur. The failure can happen for a number of
-reasons such as proteins have almost identical profiles; highly
-correlated or co-linear fractions; and/or all quantitation values in a
-particular fraction are close to zero. We find performing variance
-stabilsation normalisation (vsn) [@Huber:2002] can reduce the chances
-of numerical issues. The following code chunk demonstrates performing
-this normalisation within R and the result is visualise on figure
-\@ref(fig:e14pca1) (right). Though this step is not always necessary
-and if you experience no such issues then you should skip this step.
+<!-- We have found that the TAGM model sometimes fails due to floating -->
+<!-- point arithemtic errors.  Error messages such at `error: chol(): -->
+<!-- decomposition failed` are indicative of this issue.  Though -->
+<!-- theoretically this shouldn't happen and most of the time the issue -->
+<!-- doesn't appear, it can occur. The failure can happen for a number of -->
+<!-- reasons such as proteins have almost identical profiles; highly -->
+<!-- correlated or co-linear fractions; and/or all quantitation values in a -->
+<!-- particular fraction are close to zero. We find performing variance -->
+<!-- stabilsation normalisation (vsn) [@Huber:2002] can reduce the chances -->
+<!-- of numerical issues. The following code chunk demonstrates performing -->
+<!-- this normalisation within R and the result is visualise on figure -->
+<!-- \@ref(fig:e14pca1) (right). Though this step is not always necessary -->
+<!-- and if you experience no such issues then you should skip this step. -->
 
-```{r vsnnorm, message = FALSE}
-E14TG2aRn <- normalise(E14TG2aR, "vsn")
-```
+<!-- ```{r vsnnorm, message = FALSE} -->
+<!-- E14TG2aRn <- normalise(E14TG2aR, "vsn") -->
+<!-- ``` -->
 
-```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data before (left) and after (right) normalisation..", fig.width = 10, fig.height = 5}
-par(mfrow = c(1, 2))
+
+```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data.", fig.width = 5, fig.height = 5}
 plot2D(E14TG2aR)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6)
-plot2D(E14TG2aRn)
 ```
 
 \newpage
@@ -221,6 +220,9 @@ set.seed(2)
 mappars <- tagmMapTrain(E14TG2aR)
 mappars
 ```
+
+**TODO** Add a note on co-linearity of data.
+
 The results of the modelling can be visualised with the `plotEllipse`
 function on figure \@ref(fig:e14ellipse). The outer ellipse contains
 99% of the total probability whilst the middle and inner ellipses
@@ -321,16 +323,16 @@ that can be extracted from this analysis.
 
 Since our audience is unlikely to be versed in Bayesian methodology,
 we explain some of the key ideas for a more complete
-understanding. Firstly, MCMC-based inference constrasts with MAP based
+understanding. Firstly, MCMC based inference constrasts with MAP based
 inference in that in produces \textit{samples} from the posterior
 distribution of localisation probabilities. Hence, we do not just have
-a single estimate for each quantity but a distribution (or histogram)
-of estimates. MCMC methods are a large class of algorithms used to
-sample from a probability distribution, in our case the posterior
+a single estimate for each quantity but a distribution of
+estimates. MCMC methods are a large class of algorithms used to sample
+from a probability distribution, in our case the posterior
 distribution of the parameters [@Gilks:1995].  They design a
 Markov-chain; that is, a random sequence of events where the
 probability of the next event only depends on the current state,
-which, after convergence obtains samples form the posterior
+which, after convergence, obtains samples form the posterior
 distribution. A specific example of an MCMC algorithm is the Gibbs
 sampler, which can be applied when the parameters are conditionally
 conjugate. Often one can perform Rao-Blackwellisation , a method to
@@ -348,12 +350,13 @@ analysis to finish in a couple of hours on a medium specification
 laptop, for example.
 
 To demonstrate the class structure and expected outputs of the TAGM
-MCMC method, we run a brief analysis on the a subsest of the
-`tan2009r1` dataset from the `pRolocdata` purely for
-illustration. This is to provide a bare bones analysis of these data
-without being held back by computational requirements. We perform a
-complete demonstration and provide precise details of the analysis of
-the stem cell dataset considered above in the next section.
+MCMC method, we run a brief analysis on the a subsest (400 randomly
+chosen proteins) of the `tan2009r1` dataset from the `pRolocdata`
+purely for illustration. This is to provide a bare bones analysis of
+these data without being held back by computational requirements. We
+perform a complete demonstration and provide precise details of the
+analysis of the stem cell dataset considered above in the next
+section.
 
 ```{r}
 set.seed(1)
@@ -361,13 +364,12 @@ data(tan2009r1)
 tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
 ```
 
-The first step is run two MCMC chains for a few iterations of the
-algorithm using the `tagmMcmcTrain` function.  This function will
-generate a object of class `MCMCParams`. The summary slot of which is
-currently empty.
+The first step is to run a few MCMC chains (below we use only 2) for a
+few iterations (three below, but typically in the order of ten
+thousands) of the algorithm using the `tagmMcmcTrain` function.  This
+function will generate a object of class `MCMCParams`.
 
 ```{r tagmMcmcTrain}
-library("pRoloc")
 p <- tagmMcmcTrain(object = tan2009r1, numIter = 3,
                    burnin = 1, thin = 1, numChains = 2)
 p
@@ -375,8 +377,8 @@ p
 
 Information for each MCMC chain is contained within the chains
 slot. If needed, this information can be accessed manually. The
-function `MCMCProcess` populates the summary slot of the `MCMCParams`
-object
+function `MCMCProcess` processed the `MCMCParams` object and populates
+the summary slot.
 
 ```{r tagmMCMCProcess}
 p <- tagmMcmcProcess(p)
@@ -384,7 +386,7 @@ p
 ```
 
 The summary slot has now been populated to include basic summaries of
-the `MCMCChains`, such as organelle allocations and localisation
+the MCMC chains, such as organelle allocations and localisation
 probabilities. Protein information can be appended to the feature
 columns of the `MSnSet` by using the `tagmPredict` function, which
 extracts the required information from the summary slot of the
@@ -423,24 +425,25 @@ As well as other useful summaries of the MCMC methods:
 
 # Methods: *TAGM MCMC* the details
 
-In the code chunk below, we load the pre-computated TAGM MCMC model of
-class `MCMCParams` that is available at
-https://drive.google.com/open?id=1zozntDhE6YZ-q8wjtQ-lxZ66EEszOGYi.
+
+This section explains how to manually manipulate the MCMC output of
+the TAGM model. In the code chunk below, we load the pre-computated
+TAGM MCMC model. The data file `e14tagm.rda` is available online[^1]
+and is not directly loaded into this package for size. The file itself
+if around 500mb, which is too large to directly load into a package.
 
 ```{r loadtagm}
 load("e14Tagm.rda")
 ```
 
-This section explains how to manually manipulate the MCMC output of
-the TAGM model.  The data file 'tagmE14.rda' is available online and
-is not directly loaded into this package for size. The file itself if
-around 500mb, which is too large to directly load into a package. The
-following code, which is not evaluated, was used to produce the
-`tagmE14` MCMCParams object. We run the MCMC algorithm for 20000
-iterations with 10000 iterations discarded for burnin. We then thin
-the chain by 20. We ran 6 chains in parallel and so we obtain 500
-samples for each of the 6 chains, totalling 3000 samples. The
-resulting file is assumed to be in our working directory.
+[^1]: [https://drive.google.com/open?id=1zozntDhE6YZ-q8wjtQ-lxZ66EEszOGYi](https://drive.google.com/open?id=1zozntDhE6YZ-q8wjtQ-lxZ66EEszOGYi)
+
+The following code, which is not evaluated dynamically, was used to
+produce the `tagmE14` `MCMCParams` object. We run the MCMC algorithm
+for 20000 iterations with 10000 iterations discarded for burnin. We
+then thin the chain by 20. We ran 6 chains in parallel and so we
+obtain 500 samples for each of the 6 chains, totalling 3000
+samples. The resulting file is assumed to be in our working directory.
 
 ```{r, eval = FALSE}
 tagmE14 <- tagmMcmcTrain(E14TG2aR2,
@@ -450,10 +453,10 @@ tagmE14 <- tagmMcmcTrain(E14TG2aR2,
                          numChains = 6)
 ```
 
-Manually inspecting the object we see that it is a `MCMCParams` object
-with 6 chains.
+Manually inspecting the object, we see that it is a `MCMCParams`
+object with 6 chains.
 
-```{r,}
+```{r}
 tagmE14
 ```
 
@@ -462,7 +465,7 @@ tagmE14
 Assessing whether or not an MCMC algorithm has converged is
 challenging. Assessing and diagnosing convergence is an active area of
 research and throughout the 1990s many approaches were proposed
-[Geweke:1992, Gelman:1992; Roberts:1994; Brooks:1998]. A converged
+[@Geweke:1992;@Gelman:1992;@Roberts:1994;@Brooks:1998]. A converged
 MCMC algorithm should be oscillating rapidly around a single value
 with no monotonicity. We provide a more detailed exploration of this
 issue, but the readers should bare in mind that the methods provided
@@ -487,25 +490,27 @@ check. We make use of objects and methods in the package
 *[coda](https://CRAN.R-project.org/package=coda)* to peform this
 analysis [@coda].  Our function below automatically coerces our
 objects into *[coda](https://CRAN.R-project.org/package=coda)* for
-ease of analysis. We calculate the total number of outliers at each
-iteration of each chain and if the algorithm has converged this number
-should be the same (or very similar) across all 6 chains. We can
-observe this from the trace plots and histrograms for each MCMC
-chain. Unconverged chains are discharded from downstream analysis.
+ease of analysis. We first calculate the total number of outliers at
+each iteration of each chain and, if the algorithm has converged, this
+number should be the same (or very similar) across all 6 chains.
 
-```{r, fig.width=8, fig.height=5}
+```{r mcmcout1}
 ## Convergence diagnostic to see if more we need to discard any
 ## iterations or entire chains: compute the number of outliers for
 ## each iteration for each chain
 out <- mcmc_get_outliers(tagmE14)
+```
 
+We can observe this from the trace plots and histrograms for each MCMC
+chain (figure \@ref(fig:mcmctrace1)). Unconverged chains should be
+discharded from downstream analysis.
+
+
+```{r mcmctrace1, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains."}
 ## Using coda S3 objects to produce trace plots and histograms
-plot(out[[1]], col = "blue",   main = "Chain 1")
-plot(out[[2]], col = "green",  main = "Chain 2")
-plot(out[[3]], col = "red",    main = "Chain 3")
-plot(out[[4]], col = "yellow", main = "Chain 4")
-plot(out[[5]], col = "orange", main = "Chain 5")
-plot(out[[6]], col = "purple", main = "Chain 6")
+par(mfrow = c(6, 2))
+for (i in seq_len(nChains))
+    plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
 All of the chains are are oscillating around 2.5 and demonstrate
@@ -535,17 +540,21 @@ actual statistics computed is more complicated, but we do not go
 deeper here and a more detailed and in depth discussion can be found
 in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
 reports the $95\%$ upper confidence interval of the $\hat{R}$
-statistic. In this case ,our samples are not normally distributed.
-The *[coda](https://CRAN.R-project.org/package=coda)* package allows for transformations
-to improve normality of the data, in our case a log tranform is performed.
-@Gelman:1992 suggests that chains with $\hat{R}$ value of
-less than 1.2 are likely to have converged.
+statistic. In this case, our samples are not normally distributed (see
+traces on the right in figure \@ref(fig:mcmctrace1)).  The
+*[coda](https://CRAN.R-project.org/package=coda)* package allows for
+transformations to improve normality of the data, and in our case we
+set the `tranform` argument to apply log tranformation.  @Gelman:1992
+suggest that chains with$\hat{R}$ value of less than 1.2 are likely
+to have converged.
 
-```{r }
-## We can check Gelman diagnostic for convergence
-## (values less than <1.2  are good for convergence)
-gelman.diag(out, transform = TRUE) # the Upper C.I. is 1.03 so mcmc has likely converged
+```{r}
+gelman.diag(out, transform = TRUE)
 ```
+
+We see that the Gelman diagnostic for convergence is < 1.2 are good
+for convergence and that the upper confidence interval is 1.03,
+indicating that out MCM might have converged.
 
 We can also look at the Gelman diagnostics statistics for groups or
 pairs of chains. The first line below compute the Gelman diagnostic
@@ -553,26 +562,23 @@ across the first three chains, whereas the second calculates between
 chain 2 and chain 5.
 
 ```{r}
-## We can also check individual pairs of chains for convergence
 gelman.diag(out[1:3], transform = TRUE) # the upper C.I is 1.02
 gelman.diag(out[c(2,5)], transform = TRUE) # the upper C.I is 1.08
 ```
 
 To assess another summary statistics, we can look at the mean
 component allocation at each iteration of the MCMC algorithm and as
-before we produce trace plots of this quantity.
+before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2)).
 
-```{r, fig.width=8, fig.height=5}
-# Compute the mean component allocation at each mcmc iterations
+```{r}
 meanAlloc <- mcmc_get_meanComponent(tagmE14)
+```
 
 
-plot(meanAlloc[[1]], col = "blue",   main = "Chain 1")
-plot(meanAlloc[[2]], col = "green",  main = "Chain 2")
-plot(meanAlloc[[3]], col = "red",    main = "Chain 3")
-plot(meanAlloc[[4]], col = "yellow", main = "Chain 4")
-plot(meanAlloc[[5]], col = "orange", main = "Chain 5")
-plot(meanAlloc[[6]], col = "purple", main = "Chain 6")
+```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains."}
+par(mfrow = c(6, 2))
+for (i in seq_len(nChains))
+    plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
 As before we can produce summaries of the data.
@@ -584,10 +590,10 @@ summary(meanAlloc[[1]])
 We can already observe that there are difference between these chains
 and they oscillate around slightly different values, this raises
 suspicion that some of the chains may not have converged.  For example
-chains $1,2$ and $4$ appear to oscillate around a mean value of
-$6.1$. Chains $3$ and $5$ appear to increase and decrease rather than
-rapidly osclate. Chain $5$ seems to be oscillating around $5.7$, which
-is not in consensus with the other chains.  For a more quantitaive
+chains 1, 2 and 4 appear to oscillate around a mean value of
+6.1. Chains 3 and 5 appear to increase and decrease rather than
+rapidly osclate. Chain 5 seems to be oscillating around 5.7, which is
+not in consensus with the other chains.  For a more quantitaive
 analysis, we again apply the Gelman diagnostics to these summaries.
 
 ```{r gelmandiag}
@@ -596,26 +602,26 @@ gelman.diag(meanAlloc)
 
 The above values are quite distant from 1 and clearly greater than
 1.2, therefore we should believe these chains have not converged. As
-observed previously, chains $3,5,6$ look quite different from the
+observed previously, chains 3, 5 and 6 look quite different from the
 other chains and so we recalculate the diagnostic excluding these
-chains. The computed Gelman diagnostic below suggest that chains $1,2$
-and $4$ have converged and that we should discard chains $3,4$ and $6$
-from further analysis.
+chains. The computed Gelman diagnostic below suggest that chains 1, 2
+and 4 have converged and that we should discard chains 3, 4 and 6 from
+further analysis.
 
 ```{r gelmandia2}
-gelman.diag(meanAlloc[c(1,2,4)])
+gelman.diag(meanAlloc[c(1, 2, 4)])
 ```
 
 For a further check, we can look at the mean outlier probability at
 each iteration of the MCMC algorithm and again computing the Gelman
-diagnostics between chains $1,2$ and $4$. An$\hat{R}$ statistics of
-$1$ is indicative of convergence, since it is less than the recommend
-value of $1.2$.
+diagnostics between chains 1, 2 and 4. An $\hat{R}$ statistics of
+1 is indicative of convergence, since it is less than the recommend
+value of 1.2.
 
 
 ```{r gelmandiag3}
 meanoutProb <- mcmc_get_meanoutliersProb(tagmE14)
-gelman.diag(meanoutProb[c(1,2,4)])
+gelman.diag(meanoutProb[c(1, 2, 4)])
 ```
 
 ### Applying the Geweke diagnostic
@@ -687,7 +693,7 @@ these chains and creates and new object to store the converged chains.
 
 ```{r,}
 removeChain <- c(3, 5, 6) # The chains to be removed
-tagmE14_converged <- tagmE14[seq_len(nChains)[-removeChain]] # Create new object
+tagmE14_converged <- tagmE14[-removeChain] # Create new object
 
 ```
 
@@ -898,6 +904,6 @@ sessionInfo()
 
 The source of this document, including the code necessary to reproduce
 the analyses and figures is available in a public manuscript
-repository on GitHub~\cite{ghrepo}.
+repository on GitHub [@ghrepo].
 
 # Reference
