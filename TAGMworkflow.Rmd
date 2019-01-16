@@ -18,12 +18,16 @@ toc: FALSE
 # Introduction
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
-require(pRoloc)
 stopifnot(packageVersion("pRoloc") >= '1.23.2')
+## loading the following packages and not pRoloc yet so that we can
+## display the pRoloc startup message
+library("MSnbase")
+library("MLInterfaces")
+library("BiocParallel")
 
-require(coda)
-setStockcol(NULL)
-setStockcol(paste0(getStockcol(), 90))
+library("coda")
+pRoloc::setStockcol(NULL)
+pRoloc::setStockcol(paste0(pRoloc::getStockcol(), 90))
 ```
 
 
@@ -249,7 +253,7 @@ is not unexpected to observe small fluctations due to numerical errors
 and this should not concern users.
 
 ```{r MAPconverge}
-plot(mapRes@posteriors$logposterior, type = "b", col = "blue",
+plot(mappars@posteriors$logposterior, type = "b", col = "blue",
      cex = 0.1, ylab = "log-posterior", xlab = "iteration",
      main = "log-posterior at each iteration of the EM algorithm")
 
@@ -260,7 +264,7 @@ method appends new columns to the `fData` columns of the `MSnSet`.
 
 
 ```{r tagmPredict, cache = TRUE}
-E14TG2aR <- tagmPredict(E14TG2aR, mapRes) # Predict protein localisation
+E14TG2aR <- tagmPredict(E14TG2aR, mappars) # Predict protein localisation
 ```
 
 The new feature variables that are generated are:
@@ -355,7 +359,6 @@ the stem cell dataset considered above in the next section.
 set.seed(1)
 data(tan2009r1)
 tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
-
 ```
 
 The first step is run two MCMC chains for a few iterations of the
@@ -426,7 +429,6 @@ https://drive.google.com/open?id=1zozntDhE6YZ-q8wjtQ-lxZ66EEszOGYi.
 
 ```{r loadtagm}
 load("e14Tagm.rda")
-tagmE14
 ```
 
 This section explains how to manually manipulate the MCMC output of
@@ -657,7 +659,8 @@ output shows that we now have $450$ samples in each chain.
 
 ```{r}
 burntagmE14 <- mcmc_burn_chains(tagmE14, 50)
-burntagmE14@chains@chains
+chains(burntagmE14)
+chains(burntagmE14)[[1]]
 ```
 
 The following function recomputes the number of outliers in each chain
