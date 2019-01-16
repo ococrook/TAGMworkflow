@@ -4,16 +4,13 @@ author:
 - Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
 package: pRoloc
 bibliography: BayesProt.bib
-output: pdf_document
-
-#output:
-#  BiocStyle::html_document:
-#   toc_float: true
+output: bookdown::pdf_document2
+toc: FALSE
 ---
 
 \newcommand{\diag}{\mathop{\mathrm{diag}}}
 
-# Version
+# Versions
 -  **R**: `r R.version.string`
 -  **Bioconductor**: `r BiocManager::version()`
 - **pRoloc** `r packageVersion("pRoloc")`
@@ -21,12 +18,16 @@ output: pdf_document
 # Introduction
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
-require(pRoloc)
 stopifnot(packageVersion("pRoloc") >= '1.23.2')
+## loading the following packages and not pRoloc yet so that we can
+## display the pRoloc startup message
+library("MSnbase")
+library("MLInterfaces")
+library("BiocParallel")
 
-require(coda)
-setStockcol(NULL)
-setStockcol(paste0(getStockcol(), 90))
+library("coda")
+pRoloc::setStockcol(NULL)
+pRoloc::setStockcol(paste0(pRoloc::getStockcol(), 90))
 ```
 
 
@@ -71,19 +72,14 @@ presented here, but provides a template for others to design tools
 using Bayesian methodology for the biological community.
 
 Our model for the data is the t-augmented Gaussian mixture (TAGM)
-model proposed in:
-
-> A Bayesian Mixture Modelling Approach For Spatial Proteomics Oliver
-> M Crook, Claire M Mulvey, Paul D. W. Kirk, Kathryn S Lilley, Laurent
-> Gatto bioRxiv 282269; doi: https://doi.org/10.1101/282269
-
-The above manuscript provides a detailed description of the model,
-rigorous comparisons and testing on many spatial proteomics datasets
-and a case study on a hyperLOPIT experiment on mouse pluripotent stem
-cells [@hyper, @Mulvey:2017]. Revisiting these details is not the
-purpose of this computational protocol, rather we present how to
-correctly use the software and provide step by step guidance for
-interpreting the results.
+model proposed in [@Crook:2018]. @Crook:2018 provide a detailed
+description of the model, rigorous comparisons and testing on many
+spatial proteomics datasets and a case study on a hyperLOPIT
+experiment on mouse pluripotent stem cells
+[@hyper;@Mulvey:2017]. Revisiting these details is not the purpose of
+this computational protocol, rather we present how to correctly use
+the software and provide step by step guidance for interpreting the
+results.
 
 In brief, the TAGM model posits that each annotated sub-cellular niche
 can be described by a Gaussian distribution.  Thus the full complement
@@ -95,7 +91,7 @@ described as multivariate student's t distribution. The heavy tails of
 the t distribution allow it to better capture dispersed proteins.
 
 To perform inference in the TAGM model there are two approaches. The
-first, which we refer to as TAGM-MAP, allows us to obtain *maximum a
+first, which we refer to as TAGM MAP, allows us to obtain *maximum a
 posteriori* estimates of posterior localisation probabilities; that
 is, the modal posterior probability that a protein localises to that
 class.  This approach uses the expectation-maximisation (EM) algorithm
@@ -104,14 +100,14 @@ summary of the TAGM model, it only provides point estimates.  For a
 richer analysis, we present a Markov-chain Monte-Carlo (MCMC) method
 to perform fully Bayesian inference in our model, allowing us to
 obtain full posterior localisation distributions.  This method is
-refered to as TAGM-MCMC throughout the text.
+refered to as TAGM MCMC throughout the text.
 
 This workflow begins with a brief review of some of the basic features
-of mass-spectrometry based spatial proteomics data, including the
+of mass spectrometry-based spatial proteomics data, including the
 state-of-the-art computational infrastructure and bespoke software
 suite.  We then present each method in turn, detailing how to obtain
 high quality results. We provide an extended dicussion of the
-TAGM-MCMC method to highlight some of the challenges when apply this
+TAGM MCMC method to highlight some of the challenges when apply this
 method. This includes how to assess convergence of MCMC methods, as
 well as methods for manipulating the output. We then take the
 processed output and explain how to intepret the results, as well as
@@ -120,14 +116,14 @@ and directions for the future.
 
 # Getting started and infrastructure
 
-In this workflow, we are currently using the development version of
-`pRoloc` [@pRoloc:2014] and the current Bioconductor version of
-`pRolocdata` and `MSnbase` [@MSnbase:2012].  The pacakge `pRoloc`
-contains algorithms and methods for analysing spatial proteomics data,
-building on the `MSnSet` structure provided in `MSnbase`.  The
-`pRolocdata` package provides many annotated datasets from a variety
-of species and experimental procedures. The following code chunk
-installs the software suite of packages require for analysis.
+In this workflow, we are currently using version 1.23.2 of `pRoloc`
+[@pRoloc:2014].  The pacakge `pRoloc` contains algorithms and methods
+for analysing spatial proteomics data, building on the `MSnSet`
+structure provided in `MSnbase`.  The `pRolocdata` package provides
+many annotated datasets from a variety of species and experimental
+procedures. The following code chunks install and load the suite of
+packages require for the analysis.
+
 
 ```{r install,eval = FALSE}
 if (!require("BiocManager"))
@@ -144,33 +140,30 @@ We assume that we have a MS-based spatial proteomics dataset contained
 in a `MSnSet` structure. For information on how to import data,
 perform basic data processing, quality control, supervised machine
 learning and transfer learning see following workflow
-[@Breckels:2016b].  We use a spatial proteomics dataset on Mouse
+[@Breckels:2016b]. We use a spatial proteomics dataset on mouse
 E14TG2a embryonic stem cells [@Breckels:2013].  The LOPIT protocol
-[Dunkley:2004; @Dunkley:2006] was used and normalised intensity of
+[@Dunkley:2004;@Dunkley:2006] was used and normalised intensity of
 proteins from eight iTRAQ 8-plex labelled fraction are provided. The
 methods provided here are independent of labelling procedure,
 fractionation process or workflow. Examples of valid experimental
-protocols are LOPIT [@Dunkley:2004], hyperLOPIT [@hyper,@Mulvey:2017],
+protocols are LOPIT [@Dunkley:2004], hyperLOPIT [@hyper;@Mulvey:2017],
 label-free methods such as PCP [@Foster:2006], and when fractionation
-is perform by differential centrifugation [@DC:2018].
+is perform by differential centrifugation [@Itzhak:2016,@DC:2018].
 
 In the code chunk below, we load the aforementioned dataset. The
 printout demonstrates that this experiment quantified 2031 proteins
 over 8 fractions.
 
-```{r,}
+```{r loade14data}
 data("E14TG2aR") # load experimental data
 E14TG2aR
 ```
 
-We can visualise the mouse stem cell dataset use the `plot2D`
-function. We observe that some of the organelle classes overlap and
-this is a typical feature of biological datasets. Thus, it is vital to
-perform uncertainty quantification when analysising biological data.
-
-```{r e14pca1, fig.width = 7, fig.height = 7}
-plot2D(E14TG2aR, main = "First two principal components of mouse stem cell data")
-```
+On figure \@ref(fig:e14pca1) (left), we can visualise the mouse stem
+cell dataset use the `plot2D` function. We observe that some of the
+organelle classes overlap and this is a typical feature of biological
+datasets. Thus, it is vital to perform uncertainty quantification when
+analysising biological data.
 
 ## Aside: normalisation
 
@@ -182,21 +175,21 @@ doesn't appear, it can occur. The failure can happen for a number of
 reasons such as proteins have almost identical profiles; highly
 correlated or co-linear fractions; and/or all quantitation values in a
 particular fraction are close to zero. We find performing variance
-stabilsation normalisation (vsn) can reduce the chances of numerical
-issues [@Huber:2002]. The following code chunk demonstrates performing
-this normalisation within R. Though this step is not always necessary
+stabilsation normalisation (vsn) [@Huber:2002] can reduce the chances
+of numerical issues. The following code chunk demonstrates performing
+this normalisation within R and the result is visualise on figure
+\@ref(fig:e14pca1) (right). Though this step is not always necessary
 and if you experience no such issues then you should skip this step.
 
-```{r vsnnorm}
-E14TG2aR <- normalise(E14TG2aR, "vsn")
+```{r vsnnorm, message = FALSE}
+E14TG2aRn <- normalise(E14TG2aR, "vsn")
 ```
 
-We can visualise the results again by using `plot2D`
-
-```{r e14pca2, fig.width = 7, fig.height = 7}
-plot2D(E14TG2aR,
-       main = "PCA of mouse stem cell data after normalisation")
-
+```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data before (left) and after (right) normalisation..", fig.width = 10, fig.height = 5}
+par(mfrow = c(1, 2))
+plot2D(E14TG2aR)
+addLegend(E14TG2aR, where = "topleft", cex = 0.6)
+plot2D(E14TG2aRn)
 ```
 
 \newpage
@@ -220,30 +213,28 @@ algorithm is guaranteed to converge to a local mode. The code chunk
 below excutes the `tagmMapTrain` function for a default of 100
 iterations.  We use the default priors for simplicity and convenience,
 however they can be changed, which we explain in a later section.  The
-output is an object of class `MAPParams`.
+output is an object of class `MAPParams`, that captures the details of
+the TAGM MAP model.
 
-```{r tagmMapTrain}
+```{r tagmMapTrain, cache = TRUE}
 set.seed(2)
-mapRes <- tagmMapTrain(E14TG2aR)
-mapRes
+mappars <- tagmMapTrain(E14TG2aR)
+mappars
 ```
 The results of the modelling can be visualised with the `plotEllipse`
-function. The outer ellipse contains 99% of the total probability
-whilst the middle and inner ellipses contain 95% and 90% of the
-probability respectively. The centres of the clusters are represented
-by black circumpunct (circled dot). We can also plot the model in
-other principal components.  The code chunk below plots the
-probability ellipses along the first and second, as well as the fourth
-prinipal component. The user can change the components visualised by
-altering the `dims` argument.
+function on figure \@ref(fig:e14ellipse). The outer ellipse contains
+99% of the total probability whilst the middle and inner ellipses
+contain 95% and 90% of the probability respectively. The centres of
+the clusters are represented by black circumpunct (circled dot). We
+can also plot the model in other principal components.  The code chunk
+below plots the probability ellipses along the first and second, as
+well as the fourth prinipal component. The user can change the
+components visualised by altering the `dims` argument.
 
-```{r plotEllipse, fig.width = 8, fig.height = 16}
-par(mfrow = c(2, 1)) ## Create two panels
-plotEllipse(E14TG2aR, mapRes, main = "PCA plot with probability ellipses")
-plotEllipse(E14TG2aR,
-            mapRes,
-            dims = c(1, 4),
-            main = "Ellipse plot along 1st and 4th prinipal components")
+```{r e14ellipse, fig.width = 10, fig.height = 5, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right)"}
+par(mfrow = c(1, 2))
+plotEllipse(E14TG2aR, mappars)
+plotEllipse(E14TG2aR, mappars, dims = c(1, 4))
 ```
 
 ## The expectation-maximisation algorithm
@@ -252,33 +243,34 @@ The EM algorithm is iterative; that is, the algorithm iterates between
 an expectation step and a maximisation step until the value of the
 log-posterior does not change [@EM:1977]. This fact can be used to
 assess the convergence of the EM algoritm. The value of the
-log-posterior at each iteration is contained within the `posteriors`
-slot within the `MAPParams` object. The code chuck below plots the log
-posterior at each iteration and we see the algorithm rapidly plateaus
-and so we have acheived convergence. If convergence has not been
-reached during this time, increase the number of iteration by changing
-the parameter `numIter` in the `tagmMapTrain` method. In practice, it
-is not unexpected to observe small fluctations due to numerical errors
-and this should not concern users.
+log-posterior at each iteration can be accessed with the
+`logPosteriors` function on the `MAPParams` object. The code chuck
+below plots the log posterior at each iteration and we see on figure
+\@ref(fig:mapconverge) the algorithm rapidly plateaus and so we have
+acheived convergence. If convergence has not been reached during this
+time, increase the number of iteration by changing the parameter
+`numIter` in the `tagmMapTrain` method. In practice, it is not
+unexpected to observe small fluctations due to numerical errors and
+this should not concern users.
 
-```{r MAPconverge}
-plot(mapRes@posteriors$logposterior, type = "b", col = "blue",
-     cex = 0.1, ylab = "log-posterior", xlab = "iteration",
-     main = "log-posterior at each iteration of the EM algorithm")
+```{r mapconverge, fig.width = 6, fig.height = 4, fig.cap = "Log-posterior at each iteration of the EM algorithm demonstrating convergence."}
+plot(logPosteriors(mappars), type = "b", col = "blue",
+     cex = 0.3, ylab = "log-posterior", xlab = "iteration")
 
 ```
+
 The code chuck below uses the `MAPParams` object to classify the
 proteins of unknown localisation using `tagmPredict` function. This
 method appends new columns to the `fData` columns of the `MSnSet`.
 
 
-```{r tagmPredict}
-E14TG2aR <- tagmPredict(E14TG2aR, mapRes) # Predict protein localisation
+```{r tagmPredict, cache = TRUE}
+E14TG2aR <- tagmPredict(E14TG2aR, mappars) # Predict protein localisation
 ```
 
 The new feature variables that are generated are:
 
-- `tagm.map.allocation`: the TAGM-MAP predictions for the most
+- `tagm.map.allocation`: the TAGM MAP predictions for the most
   probable protein sub-cellular allocation.
 
 ```{r alloc}
@@ -302,13 +294,12 @@ summary(fData(E14TG2aR)$tagm.map.outlier)
 We can visualise the results by scaling the pointer according the
 posterior localisation probabilities. To do this we extract the MAP
 localisation probabilities from the feature columns of the the
-`MSnSet` and pass these to the `plot2D` function.
+`MSnSet` and pass these to the `plot2D` function (figure \@ref(fig:mappca)).
 
-```{r mapPlotting, fig.height = 7, fig.width = 7}
+```{r mappca, fig.height = 5, fig.width = 5, fig.cap = "TAGM MAP allocations"}
 ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
-
-plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze,
-       main = "TAGM-MAP allocations")
+plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
+addLegend(E14TG2aR, where = "topleft", cex = 0.6, fcol = "tagm.map.allocation")
 ```
 
 The TAGM MAP method is easy to use and it is simple to check
@@ -368,7 +359,6 @@ the stem cell dataset considered above in the next section.
 set.seed(1)
 data(tan2009r1)
 tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
-
 ```
 
 The first step is run two MCMC chains for a few iterations of the
@@ -406,7 +396,7 @@ res <- tagmPredict(object = tan2009r1, params = p)
 
 One can now access new features variables:
 
-- `tagm.mcmc.allocation`: the TAGM-MCMC prediction for the most likely
+- `tagm.mcmc.allocation`: the TAGM MCMC prediction for the most likely
   protein sub-cellular annotation.
 
 ```{r}
@@ -439,7 +429,6 @@ https://drive.google.com/open?id=1zozntDhE6YZ-q8wjtQ-lxZ66EEszOGYi.
 
 ```{r loadtagm}
 load("e14Tagm.rda")
-tagmE14
 ```
 
 This section explains how to manually manipulate the MCMC output of
@@ -538,7 +527,7 @@ an average of 2.5 outliers and there is no observed monotonicity in
 our output. However, for a more rigorous and unbiased analysis of
 convergence we can calculate the Gelman diagnostic using the
 *[coda](https://CRAN.R-project.org/package=coda)* package
-[@Gelman:1992,@Brooks:1998]. This statistics is often refered to as
+[@Gelman:1992;@Brooks:1998]. This statistics is often refered to as
 $\hat{R}$ or the potential scale reduction factor. The idea of the
 Gelman diagnostics is to compare the inter and intra chain
 variances. The ratio of these quantities should be close to one.  The
@@ -552,7 +541,7 @@ to improve normality of the data, in our case a log tranform is performed.
 @Gelman:1992 suggests that chains with $\hat{R}$ value of
 less than 1.2 are likely to have converged.
 
-```{r,}
+```{r }
 ## We can check Gelman diagnostic for convergence
 ## (values less than <1.2  are good for convergence)
 gelman.diag(out, transform = TRUE) # the Upper C.I. is 1.03 so mcmc has likely converged
@@ -670,7 +659,8 @@ output shows that we now have $450$ samples in each chain.
 
 ```{r}
 burntagmE14 <- mcmc_burn_chains(tagmE14, 50)
-burntagmE14@chains@chains
+chains(burntagmE14)
+chains(burntagmE14)[[1]]
 ```
 
 The following function recomputes the number of outliers in each chain
@@ -737,7 +727,8 @@ is now available. In information now available in the summary slot was detailed
 in section the previous section. We note that if there is more than $1$ chain
 in the `MCMCParams` object then the chains are automatically pooled
 to compute the summaries.
-```{r,}
+
+```{r tagmprocess, cache = TRUE}
 tagmE14_converged_pooled <- tagmMcmcProcess(tagmE14_converged_pooled)
 tagmE14_converged_pooled
 ```
@@ -821,7 +812,7 @@ probabilty of each protein to its most probable organelle.
 ptsze <- fData(E14TG2aR)$tagm.mcmc.probability
 
 plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation", cex = ptsze,
-       main = "TAGM-MCMC allocations")
+       main = "TAGM MCMC allocations")
 addLegend(E14TG2aR, fcol = "markers",
           where = "topleft", ncol = 2, cex = 0.6)
 ```
@@ -895,5 +886,18 @@ demonstrated, in a step by step fashion, the challenges and advantages
 to taking a Bayesian approach to data analysis. We hope this workflow
 inspires others to create documentation for the Bayesian analysis of
 biolgical data.
+
+# Session information
+
+Below, we provide a summary of all packages and versions used to
+generate this document.
+
+```{r si}
+sessionInfo()
+```
+
+The source of this document, including the code necessary to reproduce
+the analyses and figures is available in a public manuscript
+repository on GitHub~\cite{ghrepo}.
 
 # Reference

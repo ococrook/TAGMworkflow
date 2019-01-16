@@ -59,7 +59,7 @@
     pdf = {https://www.r-project.org/doc/Rnews/Rnews_2006-1.pdf},
   }
 
-@article {DC:2018,
+@article{DC:2018,
 	author = {Geladaki, Aikaterini and Kocevar Britovsek, Nina and Breckels, Lisa M. and Smith, Tom S. and Mulvey, Claire M. and Crook, Oliver M. and Gatto, Laurent and Lilley, Kathryn S.},
 	title = {LOPIT-DC: A simpler approach to high-resolution spatial proteomics},
 	year = {2018},
@@ -69,20 +69,6 @@
 	eprint = {https://www.biorxiv.org/content/early/2018/07/26/378364.full.pdf},
 	journal = {bioRxiv}
 }
-
-
-
-@article {Crook:2018,
-	author = {Crook, Oliver M and Mulvey, Claire M and Kirk, Paul D. W. and Lilley, Kathryn S and Gatto, Laurent},
-	title = {A Bayesian Mixture Modelling Approach For Spatial Proteomics},
-	year = {2018},
-	doi = {10.1101/282269},
-	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2018/03/14/282269},
-	eprint = {https://www.biorxiv.org/content/early/2018/03/14/282269.full.pdf},
-	journal = {bioRxiv}
-}
-
 
 
 @article{Foster:2006,
@@ -1085,3 +1071,56 @@ month={July}
   pages =        {},
   doi =          {10.1038/s41588-017-0020-9},
   PMID =         {29311635}}
+
+@misc{ghrepo,
+  author = {Crook, OM and Gatto, L},
+  title = {A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/ococrook/TAGMworkflow}}
+ }
+
+
+@ARTICLE{Crook:2018,
+  title    = "A Bayesian mixture modelling approach for spatial proteomics",
+  author   = "Crook, Oliver M and Mulvey, Claire M and Kirk, Paul D W and
+	      Lilley, Kathryn S and Gatto, Laurent",
+  abstract = "Analysis of the spatial sub-cellular distribution of proteins is
+	      of vital importance to fully understand context specific protein
+	      function. Some proteins can be found with a single location
+	      within a cell, but up to half of proteins may reside in multiple
+	      locations, can dynamically re-localise, or reside within an
+	      unknown functional compartment. These considerations lead to
+	      uncertainty in associating a protein to a single location.
+	      Currently, mass spectrometry (MS) based spatial proteomics relies
+	      on supervised machine learning algorithms to assign proteins to
+	      sub-cellular locations based on common gradient profiles.
+	      However, such methods fail to quantify uncertainty associated
+	      with sub-cellular class assignment. Here we reformulate the
+	      framework on which we perform statistical analysis. We propose a
+	      Bayesian generative classifier based on Gaussian mixture models
+	      to assign proteins probabilistically to sub-cellular niches, thus
+	      proteins have a probability distribution over sub-cellular
+	      locations, with Bayesian computation performed using the
+	      expectation-maximisation (EM) algorithm, as well as Markov-chain
+	      Monte-Carlo (MCMC). Our methodology allows proteome-wide
+	      uncertainty quantification, thus adding a further layer to the
+	      analysis of spatial proteomics. Our framework is flexible,
+	      allowing many different systems to be analysed and reveals new
+	      modelling opportunities for spatial proteomics. We find our
+	      methods perform competitively with current state-of-the art
+	      machine learning methods, whilst simultaneously providing more
+	      information. We highlight several examples where classification
+	      based on the support vector machine is unable to make any
+	      conclusions, while uncertainty quantification using our approach
+	      provides biologically intriguing results. To our knowledge this
+	      is the first Bayesian model of MS-based spatial proteomics data.",
+  journal  = "PLoS Comput. Biol.",
+  volume   =  14,
+  number   =  11,
+  pages    = "e1006516",
+  month    =  nov,
+  year     =  2018,
+  language = "en"
+}
