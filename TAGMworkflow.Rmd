@@ -323,16 +323,16 @@ that can be extracted from this analysis.
 
 Since our audience is unlikely to be versed in Bayesian methodology,
 we explain some of the key ideas for a more complete
-understanding. Firstly, MCMC-based inference constrasts with MAP based
+understanding. Firstly, MCMC based inference constrasts with MAP based
 inference in that in produces \textit{samples} from the posterior
 distribution of localisation probabilities. Hence, we do not just have
-a single estimate for each quantity but a distribution (or histogram)
-of estimates. MCMC methods are a large class of algorithms used to
-sample from a probability distribution, in our case the posterior
+a single estimate for each quantity but a distribution of
+estimates. MCMC methods are a large class of algorithms used to sample
+from a probability distribution, in our case the posterior
 distribution of the parameters [@Gilks:1995].  They design a
 Markov-chain; that is, a random sequence of events where the
 probability of the next event only depends on the current state,
-which, after convergence obtains samples form the posterior
+which, after convergence, obtains samples form the posterior
 distribution. A specific example of an MCMC algorithm is the Gibbs
 sampler, which can be applied when the parameters are conditionally
 conjugate. Often one can perform Rao-Blackwellisation , a method to
@@ -350,12 +350,13 @@ analysis to finish in a couple of hours on a medium specification
 laptop, for example.
 
 To demonstrate the class structure and expected outputs of the TAGM
-MCMC method, we run a brief analysis on the a subsest of the
-`tan2009r1` dataset from the `pRolocdata` purely for
-illustration. This is to provide a bare bones analysis of these data
-without being held back by computational requirements. We perform a
-complete demonstration and provide precise details of the analysis of
-the stem cell dataset considered above in the next section.
+MCMC method, we run a brief analysis on the a subsest (400 randomly
+chosen proteins) of the `tan2009r1` dataset from the `pRolocdata`
+purely for illustration. This is to provide a bare bones analysis of
+these data without being held back by computational requirements. We
+perform a complete demonstration and provide precise details of the
+analysis of the stem cell dataset considered above in the next
+section.
 
 ```{r}
 set.seed(1)
@@ -363,13 +364,12 @@ data(tan2009r1)
 tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
 ```
 
-The first step is run two MCMC chains for a few iterations of the
-algorithm using the `tagmMcmcTrain` function.  This function will
-generate a object of class `MCMCParams`. The summary slot of which is
-currently empty.
+The first step is to run a few MCMC chains (below we use only 2) for a
+few iterations (three below, but typically in the order of ten
+thousands) of the algorithm using the `tagmMcmcTrain` function.  This
+function will generate a object of class `MCMCParams`.
 
 ```{r tagmMcmcTrain}
-library("pRoloc")
 p <- tagmMcmcTrain(object = tan2009r1, numIter = 3,
                    burnin = 1, thin = 1, numChains = 2)
 p
@@ -377,8 +377,8 @@ p
 
 Information for each MCMC chain is contained within the chains
 slot. If needed, this information can be accessed manually. The
-function `MCMCProcess` populates the summary slot of the `MCMCParams`
-object
+function `MCMCProcess` processed the `MCMCParams` object and populates
+the summary slot.
 
 ```{r tagmMCMCProcess}
 p <- tagmMcmcProcess(p)
@@ -386,7 +386,7 @@ p
 ```
 
 The summary slot has now been populated to include basic summaries of
-the `MCMCChains`, such as organelle allocations and localisation
+the MCMC chains, such as organelle allocations and localisation
 probabilities. Protein information can be appended to the feature
 columns of the `MSnSet` by using the `tagmPredict` function, which
 extracts the required information from the summary slot of the
