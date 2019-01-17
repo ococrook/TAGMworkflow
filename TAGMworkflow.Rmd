@@ -35,14 +35,18 @@ Quantifying uncertainty in the spatial subcellular distribution of
 proteins allows for novel insight into protein function
 [@Crook:2018]. Many proteins live in a single location within the
 cell, however there are those that reside in mutiple locations and
-those that dynamically relocalise [@Thul:2017]. Functional
+those that dynamically relocalise [@Thul:2017]. These phenomena lead
+to variability and uncertainty in robustly assigning proteins a unique
+localisation. Functional
 comparmentalisation of proteins allows the cell to control
 biomolecular pathways and biochemical process within the
 cell. Therefore, proteins with multiple localisation may have mutiple
 functional roles [@Jeffery:2009]. Machine learning algorithms that
 fail to quantify uncertainty are unable to draw deeper insight into
 understanding cell biology from mass-spectrometry (MS) based spatial
-proteomics experiments.
+proteomics experiments. Henceforth, quantifying uncertainty allows us to
+make rigorous assessments of protein sub-cellular localisation 
+and multi-localisation.
 
 Bayesian approaches to machine learning and statistical analysis can
 provide more insight into the data, since uncertainty quantification
