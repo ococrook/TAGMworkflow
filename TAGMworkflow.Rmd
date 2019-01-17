@@ -3,6 +3,8 @@ title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
 author:
 - Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
 package: pRoloc
+graphics: yes
+fig_caption: yes
 bibliography: BayesProt.bib
 output: bookdown::pdf_document2
 toc: FALSE
@@ -45,7 +47,7 @@ functional roles [@Jeffery:2009]. Machine learning algorithms that
 fail to quantify uncertainty are unable to draw deeper insight into
 understanding cell biology from mass-spectrometry (MS) based spatial
 proteomics experiments. Henceforth, quantifying uncertainty allows us to
-make rigorous assessments of protein sub-cellular localisation 
+make rigorous assessments of protein subcellular localisation 
 and multi-localisation.
 
 Bayesian approaches to machine learning and statistical analysis can
@@ -225,7 +227,19 @@ mappars <- tagmMapTrain(E14TG2aR)
 mappars
 ```
 
-**TODO** Add a note on co-linearity of data.
+### Aside: co-linearity
+
+The previous code chunk outputs a message concerning data co-linearity.
+This is because the covariance matrix of the data has become ill-conditioned
+and as a result the inversion of this matrix becomes unstable with floating
+point arithmatic. This can lead to the failure of standard matrix algorithms upon
+which our method depends. It is standard practice to add a small ridge; 
+that is, a small multiple of the identity to stablise this matrix. 
+The printed message is a statement that this operation has been performed
+for these data.
+
+
+## Model visualisation
 
 The results of the modelling can be visualised with the `plotEllipse`
 function on figure \@ref(fig:e14ellipse). The outer ellipse contains
@@ -345,6 +359,10 @@ reduce posterior variance, to obtain a collapsed Gibbs sampler
 distribution, we can estimate the true mean of the posterior
 distribution by simply taking the mean of the samples.  In a similar
 fashion, we can obtain other summaries of the posterior distribution.
+
+```{r mcmcCartoon, fig.width=8, fig.height=15, fig.cap = "A schematic figure of MCMC sampling", message=FALSE, echo=FALSE, warning=FALSE}
+knitr::include_graphics("mcmcCartoon3.png")
+```
 
 The TAGM MCMC method is computationally intensive and requires at
 least modest processing power.  Leaving the MCMC algorithm to run
