@@ -70,7 +70,7 @@ plotMet <- function(r) {
   
   points(met[100 * c(1:r) - 99,], type = "b", col = "red", cex = 2, lwd = 3, pch = 19)
 }
-par(mfrow = c(2,2))
+par(mfrow = c(2,2), mar=c(4,4,2,1))
 plotMet(2)
 plotMet(3)
 plotMet(5)
