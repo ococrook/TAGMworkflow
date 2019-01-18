@@ -1,6 +1,7 @@
 #################
 # Simple example of MCMC sampling
 #################
+set.seed(2)
 library(fields)
 cbPalette <- c("#0072B2", "#D55E00", "#56B4E9", "#009E73")
 colorTable<- designer.colors(500, cbPalette, 
@@ -57,18 +58,20 @@ metropolisHastings <- function (n, rho) {
 
 met <- metropolisHastings(10000, 0.9)
 
+mycolb <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50")
+mycolr <- rgb(255, 0, 0, max = 255, alpha = 175, names = "red50")
 
 plotMet <- function(r) {
   a <- x[1:35,1:2]
-  plot(a, ylim = c(-5,5), xlim = c(-5,5), xlab = "Channel 1", ylab = "Channel 2", col = "blue", cex = 2, pch = 19, main = paste0("Iteration ", r))
-  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .05, npoints = 250, newplot = FALSE,
+  plot(a, ylim = c(-5,5), xlim = c(-5,5), xlab = "Channel 1", ylab = "Channel 2", col = mycolb, cex = 2, pch = 19, main = paste0("Iteration ", r))
+  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .05, npoints = 1000, newplot = FALSE,
           draw = TRUE)
-  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .01, npoints = 250, newplot = FALSE,
+  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .01, npoints = 1000, newplot = FALSE,
           draw = TRUE)
-  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .10, npoints = 250, newplot = FALSE,
+  ellipse(mu = c(0, 0), sigma = matrix(c(1, sqrt(1 - rho^2),sqrt(1 - rho^2),1), ncol = 2), alpha = .10, npoints = 1000, newplot = FALSE,
           draw = TRUE)
   
-  points(met[100 * c(1:r) - 99,], type = "b", col = "red", cex = 2, lwd = 3, pch = 19)
+  points(met[100 * c(1:r) - 99,], type = "b", col = mycolr, cex = 2, lwd = 3, pch = 19)
 }
 par(mfrow = c(2,2), mar=c(4,4,2,1))
 plotMet(2)

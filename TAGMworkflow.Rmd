@@ -360,6 +360,22 @@ distribution, we can estimate the true mean of the posterior
 distribution by simply taking the mean of the samples.  In a similar
 fashion, we can obtain other summaries of the posterior distribution.
 
+A schematic of MCMC sampling is provided in figure \@ref(fig:mcmcCartoon) to aid understanding.
+Proteins, coloured blue, are visualised along two variables of the data. Probability
+ellipises representing contours of a probability distribution
+matching the distribution of the proteins are overlayed. We now wish to obtain samples
+from this distribution. The MCMC algorithm is initialised with a starting location,
+then at each iteration a new value is proposed. These proposed values are either
+accepted or rejected (according to a carefully computed acceptance probability)
+and over many iterations the algorithm convergence and this recipe produces
+samples from the desired distribution. A large portion of the earlier samples
+may not reflect the true distribution, because the MCMC sampler has yet to converge.
+These early samples are usually discard and this is refered to informally
+as burnin. The next state of the algorithm depends on its current state and this leads
+to auto-correlation in the samples. To surpress this auto-correlation, we only retain
+every $r^{th}$ sample. This is known as thinning. The details of burnin and 
+thinning are further detailed in later sections.
+
 ```{r mcmcCartoon, fig.width=8, fig.height=15, fig.cap = "A schematic figure of MCMC sampling", message=FALSE, echo=FALSE, warning=FALSE}
 knitr::include_graphics("mcmcCartoon3.png")
 ```
