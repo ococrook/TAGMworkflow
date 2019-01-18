@@ -232,7 +232,7 @@ mappars
 The previous code chunk outputs a message concerning data co-linearity.
 This is because the covariance matrix of the data has become ill-conditioned
 and as a result the inversion of this matrix becomes unstable with floating
-point arithmatic. This can lead to the failure of standard matrix algorithms upon
+point arithmetic. This can lead to the failure of standard matrix algorithms upon
 which our method depends. It is standard practice to add a small ridge; 
 that is, a small multiple of the identity to stablise this matrix. 
 The printed message is a statement that this operation has been performed
@@ -837,11 +837,11 @@ about the number of proteins allocated to each organelle. Another
 reasonable choice would be the non-informative Jeffery's prior for the
 Dirichlet hyperparameter, which sets `beta0` is $0.5$ for each
 organelle.  The prior weight for the outlier detection class is
-a$\mathcal{B}(u, v)$ distribution.  The default for$u = 2$ and the
-default for$v = 10$. This represent the reasonable belief that
+a $\mathcal{B}(u, v)$ distribution.  The default for $u = 2$ and the
+default for $v = 10$. This represent the reasonable belief that
 $\frac{u}{u + v} = \frac{1}{6}$
-proteins *a prior* might be an outlier and we believe is unlikely that
-more than $50\%$ of proteins are outliers. Decreasing the value of$v$,
+proteins *a priori* might be an outlier and we believe is unlikely that
+more than $50\%$ of proteins are outliers. Decreasing the value of $v$,
 represent more uncertainty about the number of protein that are
 outliers.
 
