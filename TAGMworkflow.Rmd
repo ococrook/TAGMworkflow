@@ -367,7 +367,7 @@ matching the distribution of the proteins are overlayed. We now wish to obtain s
 from this distribution. The MCMC algorithm is initialised with a starting location,
 then at each iteration a new value is proposed. These proposed values are either
 accepted or rejected (according to a carefully computed acceptance probability)
-and over many iterations the algorithm convergence and this recipe produces
+and over many iterations the algorithm converges and this recipe produces
 samples from the desired distribution. A large portion of the earlier samples
 may not reflect the true distribution, because the MCMC sampler has yet to converge.
 These early samples are usually discard and this is refered to informally
@@ -484,7 +484,7 @@ obtain 500 samples for each of the 6 chains, totalling 3000
 samples. The resulting file is assumed to be in our working directory.
 
 ```{r, eval = FALSE}
-tagmE14 <- tagmMcmcTrain(E14TG2aR2,
+e14Tagm <- tagmMcmcTrain(E14TG2aR,
                          numIter = 20000,
                          burnin = 10000,
                          thin = 20,
@@ -495,7 +495,7 @@ Manually inspecting the object, we see that it is a `MCMCParams`
 object with 6 chains.
 
 ```{r}
-tagmE14
+e14Tagm
 ```
 
 ## Data exploration and convergence diagnostics
@@ -519,7 +519,7 @@ advantages but also for analysis of convergence of our chains.
 
 ```{r}
 ## Get number of chains
-nChains <- length(tagmE14)
+nChains <- length(e14Tagm)
 nChains
 ```
 
@@ -536,7 +536,7 @@ number should be the same (or very similar) across all 6 chains.
 ## Convergence diagnostic to see if more we need to discard any
 ## iterations or entire chains: compute the number of outliers for
 ## each iteration for each chain
-out <- mcmc_get_outliers(tagmE14)
+out <- mcmc_get_outliers(e14Tagm)
 ```
 
 We can observe this from the trace plots and histrograms for each MCMC
@@ -551,22 +551,24 @@ for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-All of the chains are are oscillating around 2.5 and demonstrate
-similar structure. This is indicative of convergence. We can use the
-*[coda](https://CRAN.R-project.org/package=coda)* package to produce
-summaries of our chains. Here is the `coda` summary for the first
+Chains 3, 5 and 6 oscillate around an average of 153, with rapid back and forth 
+oscillations. Chain 2 should be immediatly discarded, since it has a large jump
+in the chain with clearly skewed histogram. The other two chains oscillate differently
+with contrasting quantiles to the 3 chains in agreement, suggesting these chains
+have yet to converge. We can use the *[coda](https://CRAN.R-project.org/package=coda)* package to produce
+summaries of our chains. Here is the `coda` summary for the third
 chain.
 
 
 ```{r}
-## all chains average around 2.5 outliers
-summary(out[[1]])
+## Chains average around 153 outliers
+summary(out[[3]])
 ```
 
 ### Applying the Gelman diagnostic
 
-Thus far, our analysis appears promising. Each chain oscillates around
-an average of 2.5 outliers and there is no observed monotonicity in
+Thus far, our analysis appears promising. Three seperate chains oscillate around
+an average of 153 outliers and there is no observed monotonicity in
 our output. However, for a more rigorous and unbiased analysis of
 convergence we can calculate the Gelman diagnostic using the
 *[coda](https://CRAN.R-project.org/package=coda)* package
@@ -578,38 +580,41 @@ actual statistics computed is more complicated, but we do not go
 deeper here and a more detailed and in depth discussion can be found
 in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
 reports the $95\%$ upper confidence interval of the $\hat{R}$
-statistic. In this case, our samples are not normally distributed (see
+statistic. In this case, our samples are normally distributed (see
 traces on the right in figure \@ref(fig:mcmctrace1)).  The
 *[coda](https://CRAN.R-project.org/package=coda)* package allows for
-transformations to improve normality of the data, and in our case we
+transformations to improve normality of the data, and in some cases we
 set the `tranform` argument to apply log tranformation.  @Gelman:1992
-suggest that chains with$\hat{R}$ value of less than 1.2 are likely
+suggest that chains with $\hat{R}$ value of less than 1.2 are likely
 to have converged.
 
 ```{r}
-gelman.diag(out, transform = TRUE)
+gelman.diag(out, transform = FALSE)
+gelman.diag(out[c(1,3,4,5,6)], transform = FALSE)
+gelman.diag(out[c(3,5,6)], transform = FALSE) 
 ```
 
-We see that the Gelman diagnostic for convergence is < 1.2 are good
-for convergence and that the upper confidence interval is 1.03,
-indicating that out MCM might have converged.
+In all cases, we see that the Gelman diagnostic for convergence is < 1.2. 
+However, the upper confidence interval is 1.32 when all chains are used; 1.31
+when chain 2 is removed and when chains 1, 2 and 4 are removed the upper confidence interval
+is 1.01 indicating that the MCMC algorithm for chains 3,5 and 6 might have converged.
 
 We can also look at the Gelman diagnostics statistics for groups or
 pairs of chains. The first line below compute the Gelman diagnostic
 across the first three chains, whereas the second calculates between
-chain 2 and chain 5.
+chain 3 and chain 5.
 
 ```{r}
-gelman.diag(out[1:3], transform = TRUE) # the upper C.I is 1.02
-gelman.diag(out[c(2,5)], transform = TRUE) # the upper C.I is 1.08
+gelman.diag(out[1:3], transform = FALSE) # the upper C.I is 1.62
+gelman.diag(out[c(3,5)], transform = TRUE) # the upper C.I is 1.01
 ```
 
-To assess another summary statistics, we can look at the mean
+To assess another summary statistic, we can look at the mean
 component allocation at each iteration of the MCMC algorithm and as
 before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2)).
 
 ```{r}
-meanAlloc <- mcmc_get_meanComponent(tagmE14)
+meanAlloc <- mcmc_get_meanComponent(e14Tagm)
 ```
 
 
@@ -625,41 +630,37 @@ As before we can produce summaries of the data.
 summary(meanAlloc[[1]])
 ```
 
-We can already observe that there are difference between these chains
-and they oscillate around slightly different values, this raises
-suspicion that some of the chains may not have converged.  For example
-chains 1, 2 and 4 appear to oscillate around a mean value of
-6.1. Chains 3 and 5 appear to increase and decrease rather than
-rapidly osclate. Chain 5 seems to be oscillating around 5.7, which is
-not in consensus with the other chains.  For a more quantitaive
+We can already observe that there are some slighy difference between 
+these chains this raises suspicion that some of the chains may not have converged.  
+For example each chains appears to be oscillating around 5.7, but chains 2 and 4
+have clear bumps in the their trace plots. For a more quantitaive
 analysis, we again apply the Gelman diagnostics to these summaries.
 
 ```{r gelmandiag}
 gelman.diag(meanAlloc)
 ```
 
-The above values are quite distant from 1 and clearly greater than
-1.2, therefore we should believe these chains have not converged. As
-observed previously, chains 3, 5 and 6 look quite different from the
-other chains and so we recalculate the diagnostic excluding these
-chains. The computed Gelman diagnostic below suggest that chains 1, 2
-and 4 have converged and that we should discard chains 3, 4 and 6 from
+The above values are close to 1 and so we there are no significant difference 
+between the chains. As observed previously, chains 2 and 4
+look quite different from the other chains and so we recalculate the diagnostic
+excluding these chains. The computed Gelman diagnostic below suggest that chains 3, 5
+and 6 have converged and that we should discard chains 1, 2 and 4 from
 further analysis.
 
 ```{r gelmandia2}
-gelman.diag(meanAlloc[c(1, 2, 4)])
+gelman.diag(meanAlloc[c(3,5,6)])
 ```
 
 For a further check, we can look at the mean outlier probability at
 each iteration of the MCMC algorithm and again computing the Gelman
-diagnostics between chains 1, 2 and 4. An $\hat{R}$ statistics of
+diagnostics between chains 4, 5 and 6. An $\hat{R}$ statistics of
 1 is indicative of convergence, since it is less than the recommend
 value of 1.2.
 
 
 ```{r gelmandiag3}
-meanoutProb <- mcmc_get_meanoutliersProb(tagmE14)
-gelman.diag(meanoutProb[c(1, 2, 4)])
+meanoutProb <- mcmc_get_meanoutliersProb(e14Tagm)
+gelman.diag(meanoutProb[c(3, 5, 6)])
 ```
 
 ### Applying the Geweke diagnostic
@@ -680,12 +681,12 @@ geweke_test(meanAlloc)
 geweke_test(meanoutProb)
 ```
 
-The first test suggest chain 3 has not converged, since the p-value is
-roughly 0.01 suggesting that the mean in the first $10\%$ of
+The first test suggest chain 2 has not converged, since the p-value is
+less than $10^{-10}$ suggesting that the mean in the first $10\%$ of
 iterations is significantly different from those in the final
-$50\%$. Moreover, the second test suggests that chain 6 has not
-converged, as can be seen from a p-value close to 0.001, supporting
-our earlier beliefs that these chains have not conveged.  These
+$50\%$. Moreover, the second test and third tests also suggest chain 2
+has not converged. Furthermore, for the second test chain 4 has a marginally
+small p-value and thus further evidecet that this chain is of low quality.  These
 convergence diagnostics are not limited to the quantities we have
 computed here and further diagnostics can be perform on any summary of
 the data.
@@ -694,30 +695,30 @@ An important question to consider is whether removing an early portion
 of the chain might lead to improvment of the convergence diagonistics.
 This might be particularly relevant if a chain converges some
 iterations after our orginally specified `burin`. For example let us
-take the first Geweke test above, which suggested chain 3 had not
+take the second Geweke test above, which suggested chains 2 and 4 had not
 converged and see if discarding the initial $10\%$ of the chain
 improves the statistic. The function below removes $50$ samples ,
-informaly known as burning, from the beginning of each chain and the
+informaly known as `burnin`, from the beginning of each chain and the
 output shows that we now have $450$ samples in each chain.
 
 
 ```{r}
-burntagmE14 <- mcmc_burn_chains(tagmE14, 50)
-chains(burntagmE14)
-chains(burntagmE14)[[1]]
+burne14Tagm <- mcmc_burn_chains(e14Tagm, 50)
+chains(burne14Tagm)
+chains(burne14Tagm)[[4]]
 ```
 
 The following function recomputes the number of outliers in each chain
 at each iteration of each Markov-chain.
 
 ```{r}
-newout <- mcmc_get_outliers(burntagmE14)
+newout <- mcmc_get_outliers(burne14Tagm)
 ```
 
 The code chuck below compute the Geweke diagonstic for this new
-truncated chain and demonstrates that chain 3 has an improved Geweke
-diagnostic. Thus, in practice, it maybe useful to remove iterations
-from the beginning of the chain. However, as chain 3 did not pass the
+truncated chain and demonstrates that chain 4 has an improved Geweke
+diagnostic, whilst chain 2 does not. Thus, in practice, it maybe useful to
+remove iterations from the beginning of the chain. However, as chain 4 did not pass the
 Gelman diagnostics we still discard it from downstream analysis.
 
 ```{r gweketest}
@@ -726,12 +727,12 @@ geweke_test(newout)
 ## Processing converged chains
 
 Having made an assessment of convergence, we decide to discard chains
-$3,5$ and $6$ from any further analysis. The code chunk below remove
+$1,2$ and $4$ from any further analysis. The code chunk below remove
 these chains and creates and new object to store the converged chains.
 
 ```{r,}
-removeChain <- c(3, 5, 6) # The chains to be removed
-tagmE14_converged <- tagmE14[-removeChain] # Create new object
+removeChain <- c(1, 2, 4) # The chains to be removed
+e14Tagm_converged <- e14Tagm[-removeChain] # Create new object
 
 ```
 
@@ -742,17 +743,17 @@ another purpose. We may desire indepedent samples from our posterior
 distribution but the MCMC algorithm produces autocorrelated
 samples. Thinning can be applied to reduce the autocorrelation between
 samples. The code chuck below, which is not evaluate demonstrates
-retaining every $5^{th}$ iteration. Recall that we we thinned by $20$
+retaining every $5^{th}$ iteration. Recall that we thinned by $20$
 when we first ran the MCMC algorithm.
 
 ```{r thinchaines, eval = FALSE}
-tagmE14_converged_thinned <- mcmc_thin_chains(tagmE14_converged, freq  = 5)
+e14Tagm_converged_thinned <- mcmc_thin_chains(e14Tagm_converged, freq  = 5)
 ```
 
-We initially ran $6$ chains and after having made an assesssment of
-convergence we decided to discard $3$ of the chains. We desire to make
+We initially ran $6$ chains and, after having made an assesssment of
+convergence, we decided to discard $3$ of the chains. We desire to make
 inference using sample from all $3$ chains, since this leads to better
-posterior estimates.  In their current class strucutre all the chains
+posterior estimates.  In their current class structure all the chains
 are stored separately, so the following function pools all sample for
 all chains together to make a single longer chain with all
 samplers. Pooling a mixture of converged and unconverged chains in
@@ -760,21 +761,21 @@ likely to lead to poor quality results.
 
 
 ```{r poolchains}
-tagmE14_converged_pooled <- mcmc_pool_chains(tagmE14_converged)
-tagmE14_converged_pooled
-tagmE14_converged_pooled[[1]]
+e14Tagm_converged_pooled <- mcmc_pool_chains(e14Tagm_converged)
+e14Tagm_converged_pooled
+e14Tagm_converged_pooled[[1]]
 ```
 
 To populate the summary slot of the converged and pooled chain, we can use
 the `tagmMcmcProcess` function. As we can see from the object below a summary
-is now available. In information now available in the summary slot was detailed
-in section the previous section. We note that if there is more than $1$ chain
+is now available. The information now available in the summary slot was detailed
+in the previous section. We note that if there is more than $1$ chain
 in the `MCMCParams` object then the chains are automatically pooled
 to compute the summaries.
 
 ```{r tagmprocess, cache = TRUE}
-tagmE14_converged_pooled <- tagmMcmcProcess(tagmE14_converged_pooled)
-tagmE14_converged_pooled
+e14Tagm_converged_pooled <- tagmMcmcProcess(e14Tagm_converged_pooled)
+e14Tagm_converged_pooled
 ```
 
 To create new feature columns in the `MSnSet` and appened the summary
@@ -787,7 +788,7 @@ argument.
 
 ```{r tagmpred}
 E14TG2aR <- tagmPredict(object = E14TG2aR,
-                        params = tagmE14_converged_pooled,
+                        params = e14Tagm_converged_pooled,
                         probJoint = TRUE)
 head(fData(E14TG2aR))
 
@@ -823,7 +824,7 @@ uncertainty in the covariance is propograted to the mean, increasing
 `lambda0` increase shrinkage towards the prior. `nu0` is set to the
 number of feature variables plus $2$, which is the smallest integer
 value that ensures a finite covariance matrix.  The prior scale
-matrix$S0$ is set to
+matrix $S0$ is set to
 
 \begin{equation}
 S_0 = \frac{\diag(\frac{1}{n}\sum (X - \bar{X})^2)}{K^{1/D}},
@@ -862,7 +863,7 @@ addLegend(E14TG2aR, fcol = "markers",
 ```
 
 We can visualise other summaries of the data including a Monte-Carlo
-averaged Shannon entropy. This is a measure of uncertainty and poteins
+averaged Shannon entropy. This is a measure of uncertainty and proteins
 with greater shannon entropy have more uncertainty in their
 localisation. We observe global patterns of uncertainty, particulaly
 in areas where organelle boundaries overlap. There are also regions of
@@ -900,26 +901,26 @@ addLegend(E14TG2aR, fcol = "markers",
 Aside from global visualisation of the data, we can also interogate
 each individual protein. We can obtain the full posterior distribution
 of localisation probabilities for each protein from the
-`tagmE14_converged_pooled` object. We can use the `plot` generic on
+`e14Tagm_converged_pooled` object. We can use the `plot` generic on
 the `MCMCParams` object to obtain a violin plot of the localisation
 distribution. Simply providing the name of the protein in the second
-argument produce the plot for that protein. The transcription factor
-Q62318, also refered to as KAP1, is most probably localised to
-nucleus-Chomatin but also shows some uncertainty, potentially also
+argument produce the plot for that protein. The solute carrier transporter
+protein E9QMX3, also refered to as Slc15a1, is most probably localised to
+plasma membrane in line with its role as a transmembrane transporter
+but also shows some uncertainty, potentially also
 localising to other comparments.  The first violin plot visualises
-this uncertainty. The nucleur localisation sequence targets Q62318 to
-the nucleus to regulate cellular differentiation and
-proliferation. Thus, quantifying uncertainty recovers important
-bioligcal processes. Q9WVK4 is a membrane binding protein, as well as
-being involved in intracellular protein transport it regulates
-localisation to tubular recycling endosome membranes and so it
-unsurpising that it localisation is uncertain, because of its dynamic
-sub-cellular role.
+this uncertainty. The protein Q3V1Z5 is a supposed constitute of the 40S
+ribosome and has poor UniProt annotation with evidence only at the transcript
+level. From the plot below is is clear that Q3V1Z5 is a
+ribsomal associated protein, but it previous localisation has only been computational 
+inferred and here we provide experimental evidence of a ribosomal annotation.
+Thus, quantifying uncertainty recovers important additional annotations.
+
 
 ```{r, warning=FALSE, fig.height=4}
 par(mfrow = c(1,2)) # Create a two figure panel
-plot(tagmE14_converged_pooled, "Q62318")
-plot(tagmE14_converged_pooled, "Q9WVK4")
+plot(e14Tagm_converged_pooled, "E9QMX3")
+plot(e14Tagm_converged_pooled, "P32921")
 ```
 
 ## Discussion
