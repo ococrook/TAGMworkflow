@@ -12,11 +12,6 @@ toc: FALSE
 
 \newcommand{\diag}{\mathop{\mathrm{diag}}}
 
-# Versions
--  **R**: `r R.version.string`
--  **Bioconductor**: `r BiocManager::version()`
-- **pRoloc** `r packageVersion("pRoloc")`
-
 # Introduction
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
@@ -47,7 +42,7 @@ functional roles [@Jeffery:2009]. Machine learning algorithms that
 fail to quantify uncertainty are unable to draw deeper insight into
 understanding cell biology from mass-spectrometry (MS) based spatial
 proteomics experiments. Henceforth, quantifying uncertainty allows us to
-make rigorous assessments of protein subcellular localisation 
+make rigorous assessments of protein subcellular localisation
 and multi-localisation.
 
 Bayesian approaches to machine learning and statistical analysis can
@@ -233,8 +228,8 @@ The previous code chunk outputs a message concerning data co-linearity.
 This is because the covariance matrix of the data has become ill-conditioned
 and as a result the inversion of this matrix becomes unstable with floating
 point arithmetic. This can lead to the failure of standard matrix algorithms upon
-which our method depends. It is standard practice to add a small ridge; 
-that is, a small multiple of the identity to stablise this matrix. 
+which our method depends. It is standard practice to add a small ridge;
+that is, a small multiple of the identity to stablise this matrix.
 The printed message is a statement that this operation has been performed
 for these data.
 
@@ -373,7 +368,7 @@ may not reflect the true distribution, because the MCMC sampler has yet to conve
 These early samples are usually discard and this is refered to informally
 as burnin. The next state of the algorithm depends on its current state and this leads
 to auto-correlation in the samples. To surpress this auto-correlation, we only retain
-every $r^{th}$ sample. This is known as thinning. The details of burnin and 
+every $r^{th}$ sample. This is known as thinning. The details of burnin and
 thinning are further detailed in later sections.
 
 ```{r mcmcCartoon, fig.width=8, fig.height=15, fig.cap = "A schematic figure of MCMC sampling", message=FALSE, echo=FALSE, warning=FALSE}
@@ -551,7 +546,7 @@ for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-Chains 3, 5 and 6 oscillate around an average of 153, with rapid back and forth 
+Chains 3, 5 and 6 oscillate around an average of 153, with rapid back and forth
 oscillations. Chain 2 should be immediatly discarded, since it has a large jump
 in the chain with clearly skewed histogram. The other two chains oscillate differently
 with contrasting quantiles to the 3 chains in agreement, suggesting these chains
@@ -591,10 +586,10 @@ to have converged.
 ```{r}
 gelman.diag(out, transform = FALSE)
 gelman.diag(out[c(1,3,4,5,6)], transform = FALSE)
-gelman.diag(out[c(3,5,6)], transform = FALSE) 
+gelman.diag(out[c(3,5,6)], transform = FALSE)
 ```
 
-In all cases, we see that the Gelman diagnostic for convergence is < 1.2. 
+In all cases, we see that the Gelman diagnostic for convergence is < 1.2.
 However, the upper confidence interval is 1.32 when all chains are used; 1.31
 when chain 2 is removed and when chains 1, 2 and 4 are removed the upper confidence interval
 is 1.01 indicating that the MCMC algorithm for chains 3,5 and 6 might have converged.
@@ -630,8 +625,8 @@ As before we can produce summaries of the data.
 summary(meanAlloc[[1]])
 ```
 
-We can already observe that there are some slighy difference between 
-these chains this raises suspicion that some of the chains may not have converged.  
+We can already observe that there are some slighy difference between
+these chains this raises suspicion that some of the chains may not have converged.
 For example each chains appears to be oscillating around 5.7, but chains 2 and 4
 have clear bumps in the their trace plots. For a more quantitaive
 analysis, we again apply the Gelman diagnostics to these summaries.
@@ -640,7 +635,7 @@ analysis, we again apply the Gelman diagnostics to these summaries.
 gelman.diag(meanAlloc)
 ```
 
-The above values are close to 1 and so we there are no significant difference 
+The above values are close to 1 and so we there are no significant difference
 between the chains. As observed previously, chains 2 and 4
 look quite different from the other chains and so we recalculate the diagnostic
 excluding these chains. The computed Gelman diagnostic below suggest that chains 3, 5
@@ -912,7 +907,7 @@ localising to other comparments.  The first violin plot visualises
 this uncertainty. The protein Q3V1Z5 is a supposed constitute of the 40S
 ribosome and has poor UniProt annotation with evidence only at the transcript
 level. From the plot below is is clear that Q3V1Z5 is a
-ribsomal associated protein, but it previous localisation has only been computational 
+ribsomal associated protein, but it previous localisation has only been computational
 inferred and here we provide experimental evidence of a ribosomal annotation.
 Thus, quantifying uncertainty recovers important additional annotations.
 
