@@ -21,6 +21,7 @@ stopifnot(packageVersion("pRoloc") >= '1.23.2')
 library("MSnbase")
 library("MLInterfaces")
 library("BiocParallel")
+library("mixtools")
 
 library("coda")
 pRoloc::setStockcol(NULL)
@@ -149,7 +150,7 @@ methods provided here are independent of labelling procedure,
 fractionation process or workflow. Examples of valid experimental
 protocols are LOPIT [@Dunkley:2004], hyperLOPIT [@hyper;@Mulvey:2017],
 label-free methods such as PCP [@Foster:2006], and when fractionation
-is perform by differential centrifugation [@Itzhak:2016,@DC:2018].
+is perform by differential centrifugation [@Itzhak:2016; @DC:2018].
 
 In the code chunk below, we load the aforementioned dataset. The
 printout demonstrates that this experiment quantified 2031 proteins
@@ -374,14 +375,18 @@ auto-correlation in the samples. To surpress this auto-correlation, we
 only retain every$r^{th}$ sample. This is known as thinning. The details of burnin and
 thinning are further detailed in later sections.
 
-```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = TRUE}
+```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = FALSE}
 set.seed(2)
 met <- pRoloc:::metropolisHastings(10000, 0.9)
 par(mfrow = c(2, 2),
     mar = c(4, 4, 1, 1))
+set.seed(2)
 pRoloc:::plotMetropolisHastings(2, met, rho = 0.9)
+set.seed(2)
 pRoloc:::plotMetropolisHastings(3, met, rho = 0.9)
+set.seed(2)
 pRoloc:::plotMetropolisHastings(5, met, rho = 0.9)
+set.seed(2)
 pRoloc:::plotMetropolisHastings(30, met, rho = 0.9)
 ```
 
@@ -691,7 +696,7 @@ less than $10^{-10}$ suggesting that the mean in the first $10\%$ of
 iterations is significantly different from those in the final
 $50\%$. Moreover, the second test and third tests also suggest chain 2
 has not converged. Furthermore, for the second test chain 4 has a marginally
-small p-value and thus further evidecet that this chain is of low quality.  These
+small p-value and thus further evidence that this chain is of low quality.  These
 convergence diagnostics are not limited to the quantities we have
 computed here and further diagnostics can be perform on any summary of
 the data.
@@ -747,7 +752,7 @@ as thinning, to reduce the number of samples. Thinning also has
 another purpose. We may desire indepedent samples from our posterior
 distribution but the MCMC algorithm produces autocorrelated
 samples. Thinning can be applied to reduce the autocorrelation between
-samples. The code chuck below, which is not evaluate demonstrates
+samples. The code chuck below, which is not evaluated demonstrates
 retaining every $5^{th}$ iteration. Recall that we thinned by $20$
 when we first ran the MCMC algorithm.
 
@@ -757,7 +762,7 @@ e14Tagm_converged_thinned <- mcmc_thin_chains(e14Tagm_converged, freq  = 5)
 
 We initially ran $6$ chains and, after having made an assesssment of
 convergence, we decided to discard $3$ of the chains. We desire to make
-inference using sample from all $3$ chains, since this leads to better
+inference using samples from all $3$ chains, since this leads to better
 posterior estimates.  In their current class structure all the chains
 are stored separately, so the following function pools all sample for
 all chains together to make a single longer chain with all
@@ -924,7 +929,7 @@ uncertainty recovers important additional annotations.
 
 ```{r probdists, fig.height = 8, fig.with = 6, fig.cap = "Full posterior distribution of localisation probabilities for individual proteins.", warning = FALSE}
 p1 <- plot(e14Tagm_converged_pooled, "E9QMX3")
-p2 <- plot(e14Tagm_converged_pooled, "P32921")
+p2 <- plot(e14Tagm_converged_pooled, "Q3V1Z5")
 library(patchwork)
 p1 / p2
 ```
