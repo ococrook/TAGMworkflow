@@ -222,7 +222,7 @@ mappars <- tagmMapTrain(E14TG2aR)
 mappars
 ```
 
-### Aside: co-linearity
+### Aside: co-linearity {-}
 
 The previous code chunk outputs a message concerning data co-linearity.
 This is because the covariance matrix of the data has become ill-conditioned
@@ -355,24 +355,34 @@ distribution, we can estimate the true mean of the posterior
 distribution by simply taking the mean of the samples.  In a similar
 fashion, we can obtain other summaries of the posterior distribution.
 
-A schematic of MCMC sampling is provided in figure \@ref(fig:mcmcCartoon) to aid understanding.
-Proteins, coloured blue, are visualised along two variables of the data. Probability
-ellipises representing contours of a probability distribution
-matching the distribution of the proteins are overlayed. We now wish to obtain samples
-from this distribution. The MCMC algorithm is initialised with a starting location,
-then at each iteration a new value is proposed. These proposed values are either
-accepted or rejected (according to a carefully computed acceptance probability)
-and over many iterations the algorithm converges and this recipe produces
-samples from the desired distribution. A large portion of the earlier samples
-may not reflect the true distribution, because the MCMC sampler has yet to converge.
-These early samples are usually discard and this is refered to informally
-as burnin. The next state of the algorithm depends on its current state and this leads
-to auto-correlation in the samples. To surpress this auto-correlation, we only retain
-every $r^{th}$ sample. This is known as thinning. The details of burnin and
+A schematic of MCMC sampling is provided in figure
+\@ref(fig:mcmcCartoon) to aid understanding.  Proteins, coloured blue,
+are visualised along two variables of the data. Probability ellipises
+representing contours of a probability distribution matching the
+distribution of the proteins are overlayed. We now wish to obtain
+samples from this distribution. The MCMC algorithm is initialised with
+a starting location, then at each iteration a new value is
+proposed. These proposed values are either accepted or rejected
+(according to a carefully computed acceptance probability) and over
+many iterations the algorithm converges and this recipe produces
+samples from the desired distribution. A large portion of the earlier
+samples may not reflect the true distribution, because the MCMC
+sampler has yet to converge.  These early samples are usually discard
+and this is refered to informally as burnin. The next state of the
+algorithm depends on its current state and this leads to
+auto-correlation in the samples. To surpress this auto-correlation, we
+only retain every$r^{th}$ sample. This is known as thinning. The details of burnin and
 thinning are further detailed in later sections.
 
-```{r mcmcCartoon, fig.width=8, fig.height=15, fig.cap = "A schematic figure of MCMC sampling", message=FALSE, echo=FALSE, warning=FALSE}
-knitr::include_graphics("mcmcCartoon3.png")
+```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = TRUE}
+set.seed(2)
+met <- pRoloc:::metropolisHastings(10000, 0.9)
+par(mfrow = c(2, 2),
+    mar = c(4, 4, 1, 1))
+pRoloc:::plotMetropolisHastings(2, met, rho = 0.9)
+pRoloc:::plotMetropolisHastings(3, met, rho = 0.9)
+pRoloc:::plotMetropolisHastings(5, met, rho = 0.9)
+pRoloc:::plotMetropolisHastings(30, met, rho = 0.9)
 ```
 
 The TAGM MCMC method is computationally intensive and requires at
@@ -789,7 +799,7 @@ head(fData(E14TG2aR))
 
 ```
 
-### Aside: *Priors*
+### Aside: *Priors* {-}
 
 Bayesian analysis requires users to specify prior information about
 the parameters.  This potentially appears a challenging task; however,
@@ -846,35 +856,32 @@ outliers.
 Now that we have single pooled chain of samples from a converged MCMC
 algorithm, we can begin to analyse the results. Preliminary analysis
 includes visualising the allocated organelle and localisation
-probabilty of each protein to its most probable organelle.
+probabilty of each protein to its most probable organelle, as shown on
+figure \@ref(fig:mcmcpca).
 
-```{r, fig.height = 7, fig.width = 7}
-ptsze <- fData(E14TG2aR)$tagm.mcmc.probability
-
-plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation", cex = ptsze,
+```{r mcmcpca, fig.height = 5, fig.width = 10, fig.cap = "TAGM MCMC allocations. On the left, point size have been scaled based on allocation probabilities. On the right, the point size have been scaled based on the global uncertainty using the mean Shannon entropy."}
+par(mfrow = c(1, 2))
+plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
+       cex = fData(E14TG2aR)$tagm.mcmc.probability,
        main = "TAGM MCMC allocations")
+addLegend(E14TG2aR, fcol = "markers",
+          where = "topleft", ncol = 2, cex = 0.6)
+
+plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
+       cex = fData(E14TG2aR)$tagm.mcmc.mean.shannon,
+       main = "Visualising global uncertainty")
 addLegend(E14TG2aR, fcol = "markers",
           where = "topleft", ncol = 2, cex = 0.6)
 ```
 
 We can visualise other summaries of the data including a Monte-Carlo
-averaged Shannon entropy. This is a measure of uncertainty and proteins
-with greater shannon entropy have more uncertainty in their
-localisation. We observe global patterns of uncertainty, particulaly
-in areas where organelle boundaries overlap. There are also regions of
-low uncertainty indicating little doubt about the localisation of
-these proteins.
-
-```{r, fig.height = 7, fig.width = 7}
-ptsze2 <- fData(E14TG2aR)$tagm.mcmc.mean.shannon
-
-plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
-       cex = ptsze2,
-       main = "Visualising global uncertainty")
-addLegend(E14TG2aR, fcol = "markers",
-          where = "topleft", ncol = 2, cex = 0.6)
-
-```
+averaged Shannon entropy, as show on figure \@ref(fig:mcmcpca) on the
+right. This is a measure of uncertainty and proteins with greater
+shannon entropy have more uncertainty in their localisation. We
+observe global patterns of uncertainty, particulaly in areas where
+organelle boundaries overlap. There are also regions of low
+uncertainty indicating little doubt about the localisation of these
+proteins.
 
 We are also interested in the relatonship between localisation
 probability to the most probable class and the Shannon
@@ -883,49 +890,56 @@ is still consderable spread. Thus it is important to based inference
 not only on localisation probability but also a measure of uncertainty
 for example the Shannon entropy.
 
-```{r, fig.height=4.5}
-myColours <- getStockcol()[as.factor(fData(E14TG2aR)$tagm.mcmc.allocation)]
-plot(ptsze, ptsze2, col = myColours, pch = 19,
+```{r probvsentr, fig.width = 5, fig.height = 5, fig.cap = "Shannon entropy and localisation probability."}
+cls <- getStockcol()[as.factor(fData(E14TG2aR)$tagm.mcmc.allocation)]
+plot(fData(E14TG2aR)$tagm.mcmc.probability,
+     fData(E14TG2aR)$tagm.mcmc.mean.shannon,
+     col = cls, pch = 19,
      xlab = "Localisation probability",
-     ylab = "Shannon entropy",
-     main = "Shannon entropy and localisation probability")
+     ylab = "Shannon entropy")
 addLegend(E14TG2aR, fcol = "markers",
           where = "topright", ncol = 2, cex = 0.6)
 ```
 
 Aside from global visualisation of the data, we can also interogate
-each individual protein. We can obtain the full posterior distribution
+each individual protein. As illustrated on figure
+\@ref(fig:probdists), we can obtain the full posterior distribution
 of localisation probabilities for each protein from the
 `e14Tagm_converged_pooled` object. We can use the `plot` generic on
 the `MCMCParams` object to obtain a violin plot of the localisation
 distribution. Simply providing the name of the protein in the second
-argument produce the plot for that protein. The solute carrier transporter
-protein E9QMX3, also refered to as Slc15a1, is most probably localised to
-plasma membrane in line with its role as a transmembrane transporter
-but also shows some uncertainty, potentially also
-localising to other comparments.  The first violin plot visualises
-this uncertainty. The protein Q3V1Z5 is a supposed constitute of the 40S
-ribosome and has poor UniProt annotation with evidence only at the transcript
-level. From the plot below is is clear that Q3V1Z5 is a
-ribsomal associated protein, but it previous localisation has only been computational
-inferred and here we provide experimental evidence of a ribosomal annotation.
-Thus, quantifying uncertainty recovers important additional annotations.
+argument produce the plot for that protein. The solute carrier
+transporter protein E9QMX3, also refered to as Slc15a1, is most
+probably localised to plasma membrane in line with its role as a
+transmembrane transporter but also shows some uncertainty, potentially
+also localising to other comparments.  The first violin plot
+visualises this uncertainty. The protein Q3V1Z5 is a supposed
+constitute of the 40S ribosome and has poor UniProt annotation with
+evidence only at the transcript level. From the plot below is is clear
+that Q3V1Z5 is a ribsomal associated protein, but it previous
+localisation has only been computational inferred and here we provide
+experimental evidence of a ribosomal annotation.  Thus, quantifying
+uncertainty recovers important additional annotations.
 
 
-```{r, warning=FALSE, fig.height=4}
-par(mfrow = c(1,2)) # Create a two figure panel
-plot(e14Tagm_converged_pooled, "E9QMX3")
-plot(e14Tagm_converged_pooled, "P32921")
+```{r probdists, fig.height = 8, fig.with = 6, fig.cap = "Full posterior distribution of localisation probabilities for individual proteins.", warning = FALSE}
+p1 <- plot(e14Tagm_converged_pooled, "E9QMX3")
+p2 <- plot(e14Tagm_converged_pooled, "P32921")
+library(patchwork)
+p1 / p2
 ```
 
-## Discussion
+# Discussion
 
 We have provided a workflow for the Bayesian analysis of spatial
 proteomics using the `pRoloc` and `MSnbase` software. We have
 demonstrated, in a step by step fashion, the challenges and advantages
 to taking a Bayesian approach to data analysis. We hope this workflow
-inspires others to create documentation for the Bayesian analysis of
-biolgical data.
+will help spatial proteomics practitioners to apply our method and
+inspires others to create detailed documentation for the Bayesian
+analysis of biolgical data.
+
+\clearpage
 
 # Session information
 
