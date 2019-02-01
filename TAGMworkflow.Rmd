@@ -936,11 +936,38 @@ p1 / p2
 
 # Discussion
 
+The Bayesian analysis of biological data is of clear interest to many because
+of its ability to provide richer information about the experimental results.
+A fully Bayesian analysis differs from other machine learning approaches, since 
+it can quantify the uncertainty in our experiments. Furthermore, a generative model
+is used to explicitly describe the data rendering the output more interpretable,
+rather than the less intepretable outputs of black-box classifiers.
+
+Bayesian analysis if often characterised by its provision of a 
+probability distribution over the biological parameters of interest, as opposed
+to single point estimate of these parameters. In the case that is presented in this workflow,
+a Bayesian analysis "computes" a posterior probability distribution over the
+protein localisation probabilities. These probability distributions can then be
+rigorously interogatted for greater biological insight; in addition, it may
+allow us to ask additional questions about the data, such as whether a protein
+might be multi-localised. 
+
+Despite the wealth of information a Bayesian analysis can provide, the uptake
+amongst cell biologists is still low. This is because a Bayesian analysis 
+provides a new set of challenges with sparse guidance on it practical implementation.
+Bayesian analysis often relies on complex algorithms such as Markov-chain Monte-Carlo
+(MCMC) and a practical understanding of these algorithms and the interpretation of the
+output is a key barrier to their use. A Bayesian analysis usually consistes of three
+broad sections: (1) Data pre-processing and algorithmic implementation. 
+(2) Assessing algorithmic  convergence and (3) summarising and visualising the results.
+This workflow provides a set of tools to simplify these steps and provides
+step by step guidance in the context of the analysis of spatial proteomics data.
+
 We have provided a workflow for the Bayesian analysis of spatial
 proteomics using the `pRoloc` and `MSnbase` software. We have
 demonstrated, in a step by step fashion, the challenges and advantages
 to taking a Bayesian approach to data analysis. We hope this workflow
-will help spatial proteomics practitioners to apply our method and
+helps spatial proteomics practitioners to apply our method and
 inspires others to create detailed documentation for the Bayesian
 analysis of biolgical data.
 
