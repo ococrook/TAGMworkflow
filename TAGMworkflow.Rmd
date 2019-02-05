@@ -908,7 +908,7 @@ addLegend(E14TG2aR, fcol = "markers",
 
 Aside from global visualisation of the data, we can also interogate
 each individual protein. As illustrated on figure
-\@ref(fig:probdists), we can obtain the full posterior distribution
+\@ref(fig:probdists1), we can obtain the full posterior distribution
 of localisation probabilities for each protein from the
 `e14Tagm_converged_pooled` object. We can use the `plot` generic on
 the `MCMCParams` object to obtain a violin plot of the localisation
@@ -927,7 +927,16 @@ experimental evidence of a ribosomal annotation.  Thus, quantifying
 uncertainty recovers important additional annotations.
 
 
-```{r probdists, fig.height = 8, fig.with = 6, fig.cap = "Full posterior distribution of localisation probabilities for individual proteins.", warning = FALSE}
+<!-- NB: The first chunk below is for display only. The second one actually -->
+<!-- produces and arranges the plots. It is essential to make sure that the -->
+<!-- two calls to plot are identical. -->
+
+```{r probdists0, eval = FALSE}
+plot(e14Tagm_converged_pooled, "E9QMX3")
+plot(e14Tagm_converged_pooled, "Q3V1Z5")
+```
+
+```{r probdists1, fig.height = 8, fig.with = 6, fig.cap = "Full posterior distribution of localisation probabilities for individual proteins.", warning = FALSE, echo = FALSE}
 p1 <- plot(e14Tagm_converged_pooled, "E9QMX3")
 p2 <- plot(e14Tagm_converged_pooled, "Q3V1Z5")
 library(patchwork)
@@ -936,30 +945,32 @@ p1 / p2
 
 # Discussion
 
-The Bayesian analysis of biological data is of clear interest to many because
-of its ability to provide richer information about the experimental results.
-A fully Bayesian analysis differs from other machine learning approaches, since 
-it can quantify the uncertainty in our experiments. Furthermore, a generative model
-is used to explicitly describe the data rendering the output more interpretable,
-rather than the less intepretable outputs of black-box classifiers.
+The Bayesian analysis of biological data is of clear interest to many
+because of its ability to provide richer information about the
+experimental results.  A fully Bayesian analysis differs from other
+machine learning approaches, since it can quantify the uncertainty in
+our experiments. Furthermore, a generative model is used to explicitly
+describe the data rendering the output more interpretable, rather than
+the less intepretable outputs of black-box classifiers such as, for
+example, support vector machines (SVM).
 
-Bayesian analysis if often characterised by its provision of a 
+Bayesian analysis if often characterised by its provision of a
 probability distribution over the biological parameters of interest, as opposed
 to single point estimate of these parameters. In the case that is presented in this workflow,
 a Bayesian analysis "computes" a posterior probability distribution over the
 protein localisation probabilities. These probability distributions can then be
 rigorously interogatted for greater biological insight; in addition, it may
 allow us to ask additional questions about the data, such as whether a protein
-might be multi-localised. 
+might be multi-localised.
 
 Despite the wealth of information a Bayesian analysis can provide, the uptake
-amongst cell biologists is still low. This is because a Bayesian analysis 
+amongst cell biologists is still low. This is because a Bayesian analysis
 provides a new set of challenges with sparse guidance on it practical implementation.
 Bayesian analysis often relies on complex algorithms such as Markov-chain Monte-Carlo
 (MCMC) and a practical understanding of these algorithms and the interpretation of the
 output is a key barrier to their use. A Bayesian analysis usually consistes of three
-broad sections: (1) Data pre-processing and algorithmic implementation. 
-(2) Assessing algorithmic  convergence and (3) summarising and visualising the results.
+broad sections: (1) Data pre-processing and algorithmic implementation,
+(2) assessing algorithmic  convergence and (3) summarising and visualising the results.
 This workflow provides a set of tools to simplify these steps and provides
 step by step guidance in the context of the analysis of spatial proteomics data.
 
@@ -970,8 +981,6 @@ to taking a Bayesian approach to data analysis. We hope this workflow
 helps spatial proteomics practitioners to apply our method and
 inspires others to create detailed documentation for the Bayesian
 analysis of biolgical data.
-
-\clearpage
 
 # Session information
 
