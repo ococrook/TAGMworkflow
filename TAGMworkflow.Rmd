@@ -12,6 +12,22 @@ toc: FALSE
 
 \newcommand{\diag}{\mathop{\mathrm{diag}}}
 
+# Abstract {-}
+
+A determinant step in deciphering a proteins function is finding out its
+subcellular localisation. Due to improved multiplexing capabilities of
+high-throughput mass-spectrometry, the field of spatial proteomics has
+become increasingly popular because of its ability to now systematically localise 
+thousands of proteins per experiment. In parallel with these experimental advances,
+there has has also been improvements on the analysis of spatial proteomics data.
+In this workflow, we demonstate using `pRoloc` for the Bayesian analysis of 
+spatial proteomics data. We detail the software infrastructure and then provide
+step-by-step guidance of the analysis, including setting up a pipeline,
+assessing convergence, and interpretting downstream results. In several places
+we provide additional details on Bayesian analysis to provide users with a
+holisitic view of Bayesian analysis for spatial proteomics data. 
+
+
 # Introduction
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
@@ -45,6 +61,21 @@ understanding cell biology from mass-spectrometry (MS) based spatial
 proteomics experiments. Henceforth, quantifying uncertainty allows us to
 make rigorous assessments of protein subcellular localisation
 and multi-localisation.
+
+For proteins to carry out their functional role they must be localised
+to the correct sub-cellular compartment, ensuring the biochemical conditions
+for desired molecular interactions are met [@Gibson:2009]. Many
+pathologies, including cancer and obesity are characterised by protein
+mis-localisations  [@Olkkonen:2006, @Laurila:2009, @Luheshi:2008, @De:2011,
+@Cody:2013, @Kau:2004, @Rodriguez:2004, @Latorre:2005, @Shin:2013, @Siljee:2018].
+High-throughput spatial proteomics technologies have seen rapid improvement
+over the last decade and now a single experiment can provide spatial information on
+thousands of proteins at once [@Dunkley:2006, @Foster:2006, @hyper, @DC:2018]
+As a results of these spatial protomics technolgies many bioloical systems have 
+been characterised [@Dunkley:2006, @Tan:2009, @Hall:2009, @Breckels:2013, @hyper, @Thul:2017].
+The popularity of such methods is now evident with many new studies in recent years 
+[@hyper, @Beltran:2016, @Jadot:2017, @Itzhak:2017, @Mendes:2017, @Hirst:2018,
+@Davies:2018, @Orre:2019, @Nightingale:2019].
 
 Bayesian approaches to machine learning and statistical analysis can
 provide more insight into the data, since uncertainty quantification
