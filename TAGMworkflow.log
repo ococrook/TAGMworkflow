@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.6.18)  11 FEB 2019 11:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.6.18)  22 FEB 2019 14:43
 entering extended mode
 **./TAGMworkflow.tex
 (TAGMworkflow.tex
@@ -1000,7 +1000,7 @@ File: TAGMworkflow_files/figure-latex/mapconverge-1.pdf Graphic file (type pdf)
 Package pdftex.def Info: TAGMworkflow_files/figure-latex/mapconverge-1.pdf used
  on input line 484.
 (pdftex.def)             Requested size: 433.63878pt x 289.09251pt.
-LaTeX Font Info:    Try loading font information for TS1+lmr on input line 505.
+LaTeX Font Info:    Try loading font information for TS1+lmr on input line 506.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\lm\ts1lmr.fd"
 File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -1009,7 +1009,7 @@ figure-latex/mappca-1.pdf, id=144, 361.35pt x 361.35pt>
 File: TAGMworkflow_files/figure-latex/mappca-1.pdf Graphic file (type pdf)
 <use TAGMworkflow_files/figure-latex/mappca-1.pdf>
 Package pdftex.def Info: TAGMworkflow_files/figure-latex/mappca-1.pdf used on i
-nput line 580.
+nput line 581.
 (pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
 [7 <./TAGMworkflow_files/figure-latex/mapconverge-1.pdf>] [8 <./TAGMworkflow_fi
 les/figure-latex/mappca-1.pdf>]
@@ -1061,78 +1061,95 @@ Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf used
 (pdftex.def)             Requested size: 433.63878pt x 433.63878pt.
 [9] [10 <./TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf>]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 785.
+(Font)              <8> on input line 787.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 785.
+(Font)              <6> on input line 787.
 [11] [12]
-<TAGMworkflow_files/figure-latex/mcmctrace1-1.pdf, id=211, 578.16pt x 1084.05pt
->
-File: TAGMworkflow_files/figure-latex/mcmctrace1-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/mcmctrace1-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctrace1-1.pdf used 
-on input line 893.
+
+LaTeX Warning: Reference `fig:mcmctrace1' on page 13 undefined on input line 88
+2.
+
+
+<TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf, id=209, 578.16pt x 1084
+.05pt>
+File: TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf Graphic file (type 
+pdf)
+<use TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf>
+Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf 
+used on input line 887.
 (pdftex.def)             Requested size: 346.9075pt x 650.45157pt.
 
-LaTeX Warning: Float too large for page by 24.52156pt on input line 896.
+LaTeX Warning: Float too large for page by 24.52156pt on input line 890.
 
-[13] [14 <./TAGMworkflow_files/figure-latex/mcmctrace1-1.pdf>]
-<TAGMworkflow_files/figure-latex/mcmctrace2-1.pdf, id=234, 578.16pt x 1084.05pt
->
-File: TAGMworkflow_files/figure-latex/mcmctrace2-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/mcmctrace2-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctrace2-1.pdf used 
-on input line 1054.
+
+LaTeX Warning: Reference `fig:mcmctrace1' on page 13 undefined on input line 95
+3.
+
+[13] [14 <./TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf>]
+
+LaTeX Warning: Reference `fig:mcmctrace2' on page 15 undefined on input line 10
+38.
+
+
+<TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf, id=231, 578.16pt x 108
+4.05pt>
+File: TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf Graphic file (type
+ pdf)
+<use TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf>
+Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf
+ used on input line 1048.
 (pdftex.def)             Requested size: 346.9075pt x 650.45157pt.
 
-LaTeX Warning: Float too large for page by 24.52156pt on input line 1057.
+LaTeX Warning: Float too large for page by 24.52156pt on input line 1051.
 
-[15] [16 <./TAGMworkflow_files/figure-latex/mcmctrace2-1.pdf>] [17]
-Overfull \vbox (0.21916pt too high) detected at line 1280
- []
-
-[18] [19] [20] [21] <TAGMworkflow_files/figure-latex/mcmcpca-1.pdf, id=277, 722
-.7pt x 361.35pt>
+[15] [16 <./TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf>] [17] [18] 
+[19] [20] [21] <TAGMworkflow_files/figure-latex/mcmcpca-1.pdf, id=271, 722.7pt 
+x 361.35pt>
 File: TAGMworkflow_files/figure-latex/mcmcpca-1.pdf Graphic file (type pdf)
 <use TAGMworkflow_files/figure-latex/mcmcpca-1.pdf>
 Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmcpca-1.pdf used on 
-input line 1541.
+input line 1545.
 (pdftex.def)             Requested size: 469.76045pt x 234.88023pt.
-[22 <./TAGMworkflow_files/figure-latex/mcmcpca-1.pdf>]
-<TAGMworkflow_files/figure-latex/probvsentr-1.pdf, id=294, 361.35pt x 361.35pt>
+
+<TAGMworkflow_files/figure-latex/probvsentr-1.pdf, id=273, 361.35pt x 361.35pt>
 File: TAGMworkflow_files/figure-latex/probvsentr-1.pdf Graphic file (type pdf)
 <use TAGMworkflow_files/figure-latex/probvsentr-1.pdf>
 Package pdftex.def Info: TAGMworkflow_files/figure-latex/probvsentr-1.pdf used 
-on input line 1578.
+on input line 1586.
 (pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
-[23 <./TAGMworkflow_files/figure-latex/probvsentr-1.pdf>]
-<TAGMworkflow_files/figure-latex/probdists1-1.pdf, id=311, 469.755pt x 578.16pt
+[22]
+<TAGMworkflow_files/figure-latex/probdists1-1.pdf, id=283, 469.755pt x 578.16pt
 >
 File: TAGMworkflow_files/figure-latex/probdists1-1.pdf Graphic file (type pdf)
 <use TAGMworkflow_files/figure-latex/probdists1-1.pdf>
 Package pdftex.def Info: TAGMworkflow_files/figure-latex/probdists1-1.pdf used 
-on input line 1611.
+on input line 1620.
 (pdftex.def)             Requested size: 469.75386pt x 578.15858pt.
-[24] [25 <./TAGMworkflow_files/figure-latex/probdists1-1.pdf>] [26] [27] [28] [
-29]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2020.
+[23 <./TAGMworkflow_files/figure-latex/mcmcpca-1.pdf>] [24 <./TAGMworkflow_file
+s/figure-latex/probvsentr-1.pdf>] [25 <./TAGMworkflow_files/figure-latex/probdi
+sts1-1.pdf>] [26] [27] [28] [29]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2035.
 [30]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2020.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2035.
 (TAGMworkflow.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2020.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2020.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2035.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2035.
 
 Package rerunfilecheck Info: File `TAGMworkflow.out' has not changed.
 (rerunfilecheck)             Checksum: 956A08483A0AE72DD01C49B1985613C1;3485.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2020.
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2035.
  ) 
 Here is how much of TeX's memory you used:
- 13388 strings out of 493323
- 194601 string characters out of 3139066
- 307234 words of memory out of 3000000
- 16461 multiletter control sequences out of 15000+200000
- 80773 words of font info for 137 fonts, out of 3000000 for 9000
+ 13393 strings out of 493323
+ 194729 string characters out of 3139066
+ 306234 words of memory out of 3000000
+ 16463 multiletter control sequences out of 15000+200000
+ 80950 words of font info for 138 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,8n,38p,392b,463s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 32i,8n,38p,392b,465s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Fil
 es/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Program Files/MiKTeX 2.9/fon
 ts/enc/dvips/lm/lm-rm.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec
@@ -1152,9 +1169,9 @@ gram Files/MiKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Program Files/MiKTeX
 public/lm/lmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtk10.p
 fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/lm/lmtti10.pfb>
-Output written on TAGMworkflow.pdf (30 pages, 1346050 bytes).
+Output written on TAGMworkflow.pdf (30 pages, 1333771 bytes).
 PDF statistics:
- 493 PDF objects out of 1000 (max. 8388607)
- 109 named destinations out of 1000 (max. 500000)
+ 491 PDF objects out of 1000 (max. 8388607)
+ 110 named destinations out of 1000 (max. 500000)
  14539 words of extra memory for PDF output out of 17280 (max. 10000000)
 

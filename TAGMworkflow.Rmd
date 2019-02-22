@@ -403,7 +403,7 @@ sampler has yet to converge. These early samples are usually discarded
 and this is refered to informally as burnin. The next state of the
 algorithm depends on its current state and this leads to
 auto-correlation in the samples. To surpress this auto-correlation, we
-only retain every$r^{th}$ sample. This is known as thinning. The details of burnin and
+only retain every $r^{th}$ sample. This is known as thinning. The details of burnin and
 thinning are further detailed in later sections.
 
 ```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = FALSE}
@@ -586,10 +586,15 @@ We can observe this from the trace plots and histrograms for each MCMC
 chain (figure \@ref(fig:mcmctrace1)). Unconverged chains should be
 discarded from downstream analysis.
 
-
-```{r mcmctrace1, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains."}
+```{r mcmctraceHidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", echo=FALSE}
 ## Using coda S3 objects to produce trace plots and histograms
 par(mfrow = c(6, 2))
+for (i in seq_len(nChains))
+    plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
+```
+
+```{r mcmctrace1, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", eval=FALSE}
+## Using coda S3 objects to produce trace plots and histograms
 for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
@@ -660,9 +665,13 @@ before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2)).
 meanAlloc <- mcmc_get_meanComponent(e14Tagm)
 ```
 
-
-```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains."}
+```{r mcmctrace2hidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains.",echo=FALSE}
 par(mfrow = c(6, 2))
+for (i in seq_len(nChains))
+    plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
+```
+
+```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains.", eval = FALSE}
 for (i in seq_len(nChains))
     plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
@@ -709,7 +718,7 @@ gelman.diag(meanoutProb[c(3, 5, 6)])
 ### Applying the Geweke diagnostic
 
 Along with the Gelman diagnostics, which uses parallel chains, we can
-also apply a single chain analysis using the Geweke diagnostic.  The
+also apply a single chain analysis using the Geweke diagnostic [@Geweke:1992].  The
 Geweke diagnostic tests to see whether the mean calculated from the
 first $10\%$ of iterations is significantly different from the the
 mean calculated from the last $50\%$ of iterations.  If they are
@@ -742,7 +751,10 @@ take the second Geweke test above, which suggested chains 2 and 4 had not
 converged and see if discarding the initial $10\%$ of the chain
 improves the statistic. The function below removes $50$ samples ,
 informaly known as `burnin`, from the beginning of each chain and the
-output shows that we now have $450$ samples in each chain.
+output shows that we now have $450$ samples in each chain. In practice,
+as $2$ chains are sufficient for good posterior estimates and convergence
+we could simply discard chains $2$ and $4$ and proceed with downstream analysis
+with the remaining $4$ chains.
 
 
 ```{r}
@@ -926,7 +938,11 @@ probability to the most probable class and the Shannon
 entropy. Eventhough the two quantities are evidently correlated there
 is still considerable spread. Thus it is important to base inference
 not only on localisation probability but also a measure of uncertainty,
-for example the Shannon entropy.
+for example the Shannon entropy. Proteins with low Shannon entropy
+have low uncertainty in their localisation, whlist those with higher Shannon
+entropy have uncertain localisation. Since multi-localised protein have
+uncertain localisation to a single sub-celullar niche, exploring the Shannon
+can aid in identifying multi-localised proteins.
 
 ```{r probvsentr, fig.width = 5, fig.height = 5, fig.cap = "Shannon entropy and localisation probability."}
 cls <- getStockcol()[as.factor(fData(E14TG2aR)$tagm.mcmc.allocation)]
