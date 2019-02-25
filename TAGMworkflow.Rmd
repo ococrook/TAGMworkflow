@@ -77,7 +77,7 @@ The popularity of such methods is now evident with many new studies in recent ye
 [@hyper, @Beltran:2016, @Jadot:2017, @Itzhak:2017, @Mendes:2017, @Hirst:2018,
 @Davies:2018, @Orre:2019, @Nightingale:2019].
 
-Bayesian approaches to machine learning and statists can
+Bayesian approaches to machine learning and statistics can
 provide more insight, by providing uncertainty quantification
 [@Gelman:1995]. In a parametric Bayesian setting, a parametric model  
 is proposed, along with a statement about our prior beliefs
