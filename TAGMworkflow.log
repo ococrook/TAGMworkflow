@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.6.18)  22 FEB 2019 14:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.6.18)  26 FEB 2019 10:39
 entering extended mode
 **./TAGMworkflow.tex
 (TAGMworkflow.tex
@@ -845,7 +845,8 @@ Package: titling 2009/09/04 v2.1d maketitle typesetting
 \thanksmarkwidth=\skip53
 \thanksmargin=\skip54
 \droptitle=\skip55
-) (TAGMworkflow.aux)
+)
+No file TAGMworkflow.aux.
 \openout1 = `TAGMworkflow.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 129.
@@ -935,243 +936,23 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 129.
 LaTeX Info: Redefining \pageref on input line 129.
 LaTeX Info: Redefining \nameref on input line 129.
-(TAGMworkflow.out) (TAGMworkflow.out)
 \@outlinefile=\write4
 \openout4 = `TAGMworkflow.out'.
 
-("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
-[Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count128
-\scratchdimen=\dimen145
-\scratchbox=\box34
-\nofMPsegments=\count129
-\nofMParguments=\count130
-\everyMPshowfont=\toks26
-\MPscratchCnt=\count131
-\MPscratchDim=\dimen146
-\MPnumerator=\count132
-\makeMPintoPDFobject=\count133
-\everyMPtoPDFconversion=\toks27
-) ("C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\epstopdf-base.sty"
-Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
-("C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\grfext.sty"
-Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
-)
-Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
-38.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
-G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 456.
-)
-LaTeX Font Info:    Try loading font information for T1+lmtt on input line 144.
-
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\t1lmtt.fd"
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [1
-
-{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 273.
-[2]
-LaTeX Font Info:    Try loading font information for TS1+lmtt on input line 301
-.
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\ts1lmtt.fd"
-File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) <TAGMworkflow_files/figure-latex/e14pca1-1.pdf, id=96, 361.35pt x 361.35pt>
-File: TAGMworkflow_files/figure-latex/e14pca1-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/e14pca1-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/e14pca1-1.pdf used on 
-input line 366.
-(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
-[3] [4 <./TAGMworkflow_files/figure-latex/e14pca1-1.pdf>]
-<TAGMworkflow_files/figure-latex/e14ellipse-1.pdf, id=118, 722.7pt x 361.35pt>
-File: TAGMworkflow_files/figure-latex/e14ellipse-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/e14ellipse-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/e14ellipse-1.pdf used 
-on input line 453.
-(pdftex.def)             Requested size: 469.76045pt x 234.88023pt.
-[5]
-<TAGMworkflow_files/figure-latex/mapconverge-1.pdf, id=127, 433.62pt x 289.08pt
->
-File: TAGMworkflow_files/figure-latex/mapconverge-1.pdf Graphic file (type pdf)
-
-<use TAGMworkflow_files/figure-latex/mapconverge-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mapconverge-1.pdf used
- on input line 484.
-(pdftex.def)             Requested size: 433.63878pt x 289.09251pt.
-LaTeX Font Info:    Try loading font information for TS1+lmr on input line 506.
-
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\ts1lmr.fd"
-File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [6 <./TAGMworkflow_files/figure-latex/e14ellipse-1.pdf>] <TAGMworkflow_files/
-figure-latex/mappca-1.pdf, id=144, 361.35pt x 361.35pt>
-File: TAGMworkflow_files/figure-latex/mappca-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/mappca-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mappca-1.pdf used on i
-nput line 581.
-(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
-[7 <./TAGMworkflow_files/figure-latex/mapconverge-1.pdf>] [8 <./TAGMworkflow_fi
-les/figure-latex/mappca-1.pdf>]
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 638.
-
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\ot1lmr.fd"
-File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 638.
-
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\omllmm.fd"
-File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 638
-.
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\omslmsy.fd"
-File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 638
-.
-("C:\Program Files\MiKTeX 2.9\tex\latex\lm\omxlmex.fd"
-File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 638.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 638.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 638.
-LaTeX Font Info:    Try loading font information for U+msa on input line 638.
-("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-) ("C:\Program Files\MiKTeX 2.9\tex\latex\microtype\mt-msa.cfg"
-File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
-)
-LaTeX Font Info:    Try loading font information for U+msb on input line 638.
-("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) ("C:\Program Files\MiKTeX 2.9\tex\latex\microtype\mt-msb.cfg"
-File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
-)
-<TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf, id=170, 433.62pt x 433.62pt
->
-File: TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf Graphic file (type pdf)
-
-<use TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf used
- on input line 643.
-(pdftex.def)             Requested size: 433.63878pt x 433.63878pt.
-[9] [10 <./TAGMworkflow_files/figure-latex/mcmcCartoon-1.pdf>]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 787.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 787.
-[11] [12]
-
-LaTeX Warning: Reference `fig:mcmctrace1' on page 13 undefined on input line 88
-2.
-
-
-<TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf, id=209, 578.16pt x 1084
-.05pt>
-File: TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf Graphic file (type 
-pdf)
-<use TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf 
-used on input line 887.
-(pdftex.def)             Requested size: 346.9075pt x 650.45157pt.
-
-LaTeX Warning: Float too large for page by 24.52156pt on input line 890.
-
-
-LaTeX Warning: Reference `fig:mcmctrace1' on page 13 undefined on input line 95
-3.
-
-[13] [14 <./TAGMworkflow_files/figure-latex/mcmctraceHidden-1.pdf>]
-
-LaTeX Warning: Reference `fig:mcmctrace2' on page 15 undefined on input line 10
-38.
-
-
-<TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf, id=231, 578.16pt x 108
-4.05pt>
-File: TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf Graphic file (type
- pdf)
-<use TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf
- used on input line 1048.
-(pdftex.def)             Requested size: 346.9075pt x 650.45157pt.
-
-LaTeX Warning: Float too large for page by 24.52156pt on input line 1051.
-
-[15] [16 <./TAGMworkflow_files/figure-latex/mcmctrace2hidden-1.pdf>] [17] [18] 
-[19] [20] [21] <TAGMworkflow_files/figure-latex/mcmcpca-1.pdf, id=271, 722.7pt 
-x 361.35pt>
-File: TAGMworkflow_files/figure-latex/mcmcpca-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/mcmcpca-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/mcmcpca-1.pdf used on 
-input line 1545.
-(pdftex.def)             Requested size: 469.76045pt x 234.88023pt.
-
-<TAGMworkflow_files/figure-latex/probvsentr-1.pdf, id=273, 361.35pt x 361.35pt>
-File: TAGMworkflow_files/figure-latex/probvsentr-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/probvsentr-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/probvsentr-1.pdf used 
-on input line 1586.
-(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
-[22]
-<TAGMworkflow_files/figure-latex/probdists1-1.pdf, id=283, 469.755pt x 578.16pt
->
-File: TAGMworkflow_files/figure-latex/probdists1-1.pdf Graphic file (type pdf)
-<use TAGMworkflow_files/figure-latex/probdists1-1.pdf>
-Package pdftex.def Info: TAGMworkflow_files/figure-latex/probdists1-1.pdf used 
-on input line 1620.
-(pdftex.def)             Requested size: 469.75386pt x 578.15858pt.
-[23 <./TAGMworkflow_files/figure-latex/mcmcpca-1.pdf>] [24 <./TAGMworkflow_file
-s/figure-latex/probvsentr-1.pdf>] [25 <./TAGMworkflow_files/figure-latex/probdi
-sts1-1.pdf>] [26] [27] [28] [29]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2035.
-[30]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2035.
-(TAGMworkflow.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2035.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2035.
-
-Package rerunfilecheck Info: File `TAGMworkflow.out' has not changed.
-(rerunfilecheck)             Checksum: 956A08483A0AE72DD01C49B1985613C1;3485.
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2035.
- ) 
+! I can't write on file `TAGMworkflow.pdf'.
+Please type another file name for output
+! Emergency stop.
+<to be read again> 
+                   \edef 
+l.129 \begin{document}
+                       
 Here is how much of TeX's memory you used:
- 13393 strings out of 493323
- 194729 string characters out of 3139066
- 306234 words of memory out of 3000000
- 16463 multiletter control sequences out of 15000+200000
- 80950 words of font info for 138 fonts, out of 3000000 for 9000
+ 12302 strings out of 493323
+ 176389 string characters out of 3139066
+ 284849 words of memory out of 3000000
+ 15734 multiletter control sequences out of 15000+200000
+ 7559 words of font info for 18 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,8n,38p,392b,465s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Fil
-es/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Program Files/MiKTeX 2.9/fon
-ts/enc/dvips/lm/lm-rm.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec
-.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program 
-Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ts1.enc}<C:/Program Files/MiKTeX 2.9/fon
-ts/type1/public/lm/lmbx10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/l
-m/lmbx12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmbxi10.pfb><C:
-/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmex10.pfb><C:/Program Files/Mi
-KTeX 2.9/fonts/type1/public/lm/lmmi10.pfb><C:/Program Files/MiKTeX 2.9/fonts/ty
-pe1/public/lm/lmmi7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr1
-0.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr17.pfb><C:/Program 
-Files/MiKTeX 2.9/fonts/type1/public/lm/lmr6.pfb><C:/Program Files/MiKTeX 2.9/fo
-nts/type1/public/lm/lmr7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm
-/lmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Pro
-gram Files/MiKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Program Files/MiKTeX
- 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
-public/lm/lmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtk10.p
-fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb><C:/Program Fi
-les/MiKTeX 2.9/fonts/type1/public/lm/lmtti10.pfb>
-Output written on TAGMworkflow.pdf (30 pages, 1333771 bytes).
-PDF statistics:
- 491 PDF objects out of 1000 (max. 8388607)
- 110 named destinations out of 1000 (max. 500000)
- 14539 words of extra memory for PDF output out of 17280 (max. 10000000)
+ 32i,1n,38p,239b,270s stack positions out of 5000i,500n,10000p,200000b,50000s
 
+!  ==> Fatal error occurred, no output PDF file produced!
