@@ -1,5 +1,5 @@
 ---
-title: "A Bioconductor workflow for the Bayesian Analysis of Spatial proteomics"
+title: "A Bioconductor workflow for the Bayesian analysis of spatial proteomics"
 author:
 - Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
 package: pRoloc
@@ -79,14 +79,13 @@ The popularity of such methods is now evident with many new studies in recent ye
 
 Bayesian approaches to machine learning and statistics can
 provide more insight, by providing uncertainty quantification
-[@Gelman:1995]. In a parametric Bayesian setting, a parametric model  
+[@Gelman:1995]. In a parametric Bayesian setting, a parametric model
 is proposed, along with a statement about our prior beliefs
 of the model parameters. Bayes' theorem tells us how to update the
 prior distribution of the parameters to obtain the posterior
 distribution of the parameters after observing the data. It is the
 posterior distribution which quantifies the uncertainty in the
-parameters. This
-contrasts from a maximum-likelihood approach where we obtain only a
+parameters. This contrasts from a maximum-likelihood approach where we obtain only a
 point estimate of the parameters.
 
 Adopting a Bayesian framework for data analysis, though of much
@@ -386,14 +385,15 @@ a starting location, then at each iteration a new value is
 proposed. These proposed values are either accepted or rejected
 (according to a carefully computed acceptance probability) and over
 many iterations the algorithm converges and produces
-samples from the desired distribution. A large portion of the earlier
+samples from the desired distribution. Samples from the mean of this distribution
+are coloured in red in the schematic figure. A large portion of the earlier
 samples may not reflect the true distribution, because the MCMC
 sampler has yet to converge. These early samples are usually discarded
 and this is referred to as burn-in. The next state of the
 algorithm depends on its current state and this leads to
 auto-correlation in the samples. To suppress this auto-correlation, we
 only retain every $r^{th}$ sample. This is known as thinning. The details of burn-in and
-thinning are further detailed in later sections.
+thinning are further explained in later sections.
 
 ```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = FALSE}
 set.seed(2)
@@ -537,7 +537,7 @@ challenging. Assessing and diagnosing convergence is an active area of
 research and throughout the 1990s many approaches were proposed
 [@Geweke:1992;@Gelman:1992;@Roberts:1994;@Brooks:1998].  We provide a more detailed exploration of this
 issue, but readers should bare in mind that the methods provided
-below are diagnostics and cannot guarantee convergence We direct readers
+below are diagnostics and cannot guarantee convergence. We direct readers
 to several important works in the literature discussing the assessment
 of convergence. Users that do not assess convergence and base their
 downstream analysis on unconverged chains are likely to obtain poor
@@ -563,14 +563,14 @@ each iteration of each chain and, if the algorithm has converged, this
 number should be the same (or very similar) across all 6 chains.
 
 ```{r mcmcout1}
-## Convergence diagnostic to see if more we need to discard any
+## Convergence diagnostic to see if we need to discard any
 ## iterations or entire chains: compute the number of outliers for
 ## each iteration for each chain
 out <- mcmc_get_outliers(e14Tagm)
 ```
 
 We can observe this from the trace plots and histograms for each MCMC
-chain (figure \@ref(fig:mcmctrace1)). Unconverged chains should be
+chain (figure \@ref(fig:mcmctraceHidden)). Unconverged chains should be
 discarded from downstream analysis.
 
 ```{r mcmctraceHidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", echo=FALSE}
@@ -614,7 +614,7 @@ variances. The ratio of these quantities should be close to one. A more detailed
 in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
 reports the $95\%$ upper confidence interval of the $\hat{R}$
 statistic. In this case, our samples are approximately normally distributed (see
-traces on the right in figure \@ref(fig:mcmctrace1)).  The
+traces on the right in figure \@ref(fig:mcmctraceHidden)).  The
 *[coda](https://CRAN.R-project.org/package=coda)* package allows for
 transformations to improve normality of the data, and in some cases we
 set the `transform` argument to apply log transformation.  @Gelman:1992
@@ -644,7 +644,7 @@ gelman.diag(out[c(3,5)], transform = TRUE) # the upper C.I is 1.01
 
 To assess another summary statistic, we can look at the mean
 component allocation at each iteration of the MCMC algorithm and as
-before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2)).
+before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2hidden)).
 
 ```{r}
 meanAlloc <- mcmc_get_meanComponent(e14Tagm)
@@ -767,8 +767,8 @@ geweke_test(newout)
 ## Processing converged chains
 
 Having made an assessment of convergence, we decide to discard chains
-$1,2$ and $4$ from any further analysis. The code chunk below remove
-these chains and creates and new object to store the converged chains.
+$1,2$ and $4$ from any further analysis. The code chunk below removes
+these chains and creates a new object to store the converged chains.
 
 ```{r,}
 removeChain <- c(1, 2, 4) # The chains to be removed
@@ -780,8 +780,8 @@ The `MCMCParams` object can be large and therefore if we have a large
 number of samples we may want to subsample our chain, known
 as *thinning*, to reduce the number of samples. Thinning also has
 another purpose. We may desire independent samples from our posterior
-distribution but the MCMC algorithm produces autocorrelated
-samples. Thinning can be applied to reduce the autocorrelation between
+distribution but the MCMC algorithm produces auto-correlated
+samples. Thinning can be applied to reduce the auto-correlation between
 samples. The code chuck below, which is not evaluated, demonstrates
 retaining every $5^{th}$ iteration. Recall that we thinned by $20$
 when we first ran the MCMC algorithm.
@@ -822,7 +822,7 @@ To create new feature columns in the `MSnSet` and append the summary
 information, we apply the `tagmPredict` function. The `probJoint`
 argument indicates whether or not to add probabilistic information for
 all organelles for all proteins, rather than just the information for
-the most probable organelle. The outlier probabilities are also return
+the most probable organelle. The outlier probabilities are also returned
 by default, but users can change this using the `probOutlier`
 argument.
 
