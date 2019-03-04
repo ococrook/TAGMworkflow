@@ -20,12 +20,12 @@ become increasingly popular due to improved multiplexing capabilities in
 high-throughput mass-spectrometry, which have made it possible to systematically localise
 thousands of proteins per experiment. In parallel with these experimental advances,
 improved methods for analysing spatial proteomics data have also been developed.
-In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of 
+In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of
 spatial proteomics data. We detail the software infrastructure and then provide
 step-by-step guidance of the analysis, including setting up a pipeline,
 assessing convergence, and interpreting downstream results. In several places
 we provide additional details on Bayesian analysis to provide users with a
-holistic view of Bayesian analysis for spatial proteomics data. 
+holistic view of Bayesian analysis for spatial proteomics data.
 
 
 # Introduction
@@ -72,9 +72,9 @@ mis-localisations  [@Olkkonen:2006, @Laurila:2009, @Luheshi:2008, @De:2011,
 High-throughput spatial proteomics technologies have seen rapid improvement
 over the last decade and now a single experiment can provide spatial information on
 thousands of proteins at once [@Dunkley:2006, @Foster:2006, @hyper, @DC:2018].
-As a result of these spatial proteomics technologies many biological systems have 
+As a result of these spatial proteomics technologies many biological systems have
 been characterised [@Dunkley:2006, @Tan:2009, @Hall:2009, @Breckels:2013, @hyper, @Thul:2017].
-The popularity of such methods is now evident with many new studies in recent years 
+The popularity of such methods is now evident with many new studies in recent years
 [@hyper, @Beltran:2016, @Jadot:2017, @Itzhak:2017, @Mendes:2017, @Hirst:2018,
 @Davies:2018, @Orre:2019, @Nightingale:2019].
 
@@ -139,10 +139,10 @@ state-of-the-art computational infrastructure and bespoke software
 suite.  We then present each method in turn, detailing how to obtain
 high quality results. We provide an extended discussion of the
 TAGM MCMC method to highlight some of the challenges that may arise
-when applying this method. This includes how to assess convergence of 
-MCMC methods, as well as methods for manipulating the output. We then 
-take the processed output and explain how to interpret the results, as 
-well as providing some tools for visualisation. We conclude with some 
+when applying this method. This includes how to assess convergence of
+MCMC methods, as well as methods for manipulating the output. We then
+take the processed output and explain how to interpret the results, as
+well as providing some tools for visualisation. We conclude with some
 remarks and directions for the future.
 
 # Getting started and infrastructure
@@ -171,7 +171,7 @@ We assume that we have a MS-based spatial proteomics dataset contained
 in a `MSnSet` structure. For information on how to import data,
 perform basic data processing, quality control, supervised machine
 learning and transfer learning we refer the reader to
-[@Breckels:2016b]. Here, we start by loading a spatial proteomics dataset 
+[@Breckels:2016b]. Here, we start by loading a spatial proteomics dataset
 on mouse E14TG2a embryonic stem cells [@Breckels:2016]. The LOPIT protocol
 [@Dunkley:2004;@Dunkley:2006] was used and the normalised intensity of
 proteins from eight iTRAQ 8-plex labelled fraction are provided. The
@@ -234,7 +234,7 @@ is the mode of the posterior distribution and can be used to
 provide a point estimate summary of the posterior localisation
 probabilities.  In contrast to TAGM MCMC (see later), it does not provide samples from the posterior
 distribution, however it allows for faster inference by using an extended version of the
-expectation-maximisation (EM) algorithm. The EM algorithm 
+expectation-maximisation (EM) algorithm. The EM algorithm
 iterates between an expectation step and a maximisation step. This
 allows us to find parameters which maximise the logarithm of the
 posterior, in the presence of latent (unobserved) variables. The EM
@@ -257,7 +257,7 @@ The previous code chunk outputs a message concerning data collinearity.
 This is because the covariance matrix of the data has become ill-conditioned
 and as a result the inversion of this matrix becomes unstable with floating
 point arithmetic. This can lead to the failure of standard matrix algorithms upon
-which our method depends. In this case, it is standard practice to add a small 
+which our method depends. In this case, it is standard practice to add a small
 multiple of the identity to stabilise this matrix.
 The printed message is a statement that this operation has been performed
 for these data.
@@ -292,7 +292,7 @@ log-posterior at each iteration can be accessed with the
 below plots the log posterior at each iteration and we see on figure
 \@ref(fig:mapconverge) the algorithm rapidly plateaus and so we have
 achieved convergence. If convergence has not been reached during this
-time, we suggest to increase the number of iterations by changing the 
+time, we suggest to increase the number of iterations by changing the
 parameter `numIter` in the `tagmMapTrain` method. In practice, it is not
 unexpected to observe small fluctuations due to numerical errors and
 this should not concern users.
@@ -302,8 +302,8 @@ plot(logPosteriors(mappars), type = "b", col = "blue",
      cex = 0.3, ylab = "log-posterior", xlab = "iteration")
 ```
 
-The code chuck below uses the `mappars` object generated above, along 
-with the `E14RG2aR` dataset, to classify the proteins of unknown localisation 
+The code chuck below uses the `mappars` object generated above, along
+with the `E14RG2aR` dataset, to classify the proteins of unknown localisation
 using `tagmPredict` function. The results of running `tagmPredict` are
 appended to the `fData` columns of the `MSnSet`.
 
@@ -357,7 +357,7 @@ particular case, we use a *collapsed Gibbs sampler*
 # Methods: *TAGM MCMC* a brief overview
 
 The TAGM MCMC method allows a fully Bayesian analysis of spatial
-proteomics datasets. It employs a collapsed Gibbs sampler to 
+proteomics datasets. It employs a collapsed Gibbs sampler to
 sample from the posterior distribution of localisation probablities,
 providing a rich analysis of the data. This section demonstrates the
 advantage of taking a Bayesian approach and the biological information
@@ -433,11 +433,11 @@ data(tan2009r1)
 tan2009r1 <- tan2009r1[sample(nrow(tan2009r1), 400), ]
 ```
 
-The first step is to run a few MCMC chains (below we use only 2 chains) 
-for a few iterations (we specify 3 iterations in the below code, but 
-typically we would suggest in the order of tens of thousands; see for 
-example the algorithms default settings by typing `?tagmMcmcTrain`) 
-using the `tagmMcmcTrain` function.  This function will generate a 
+The first step is to run a few MCMC chains (below we use only 2 chains)
+for a few iterations (we specify 3 iterations in the below code, but
+typically we would suggest in the order of tens of thousands; see for
+example the algorithms default settings by typing `?tagmMcmcTrain`)
+using the `tagmMcmcTrain` function.  This function will generate a
 object of class `MCMCParams`.
 
 ```{r tagmMcmcTrain}
@@ -500,7 +500,7 @@ We can also access other useful summaries of the MCMC methods:
 This section explains how to manually manipulate the MCMC output of
 the TAGM model. In the code chunk below, we load a pre-computed
 TAGM MCMC model. The data file `e14tagm.rda` is available online[^1]
-and is not directly loaded into this package due to its size. The file 
+and is not directly loaded into this package due to its size. The file
 itself if around 500mb, which is too large to directly load into a package.
 
 ```{r loadtagm}
@@ -536,13 +536,13 @@ e14Tagm
 Assessing whether or not an MCMC algorithm has converged is
 challenging. Assessing and diagnosing convergence is an active area of
 research and throughout the 1990s many approaches were proposed
-[@Geweke:1992;@Gelman:1992;@Roberts:1994;@Brooks:1998].  We provide a more detailed exploration of this
-issue, but readers should bare in mind that the methods provided
-below are diagnostics and cannot guarantee convergence. We direct readers
-to several important works in the literature discussing the assessment
-of convergence. Users that do not assess convergence and base their
-downstream analysis on unconverged chains are likely to obtain poor
-quality results.
+[@Geweke:1992;@Gelman:1992;@Roberts:1994;@Brooks:1998].  We provide a
+more detailed exploration of this issue, but readers should bare in
+mind that the methods provided below are diagnostics and cannot
+guarantee convergence. We direct readers to several important works in
+the literature discussing the assessment of convergence. Users that do
+not assess convergence and base their downstream analysis on
+unconverged chains are likely to obtain poor quality results.
 
 We first assess convergence using a parallel chains approach. We find
 producing multiple chains is benificial not only for computational
@@ -587,11 +587,13 @@ for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-Chains 3, 5 and 6 are centred around an average of 153, with rapid back and forth
-oscillations. Chain 2 should be immediately discarded, since it has a large jump
-in the chain with clearly skewed histogram. The other two chains oscillate differently
-with contrasting quantiles to the 3 chains (3, 5 and 6) that agree with one another, suggesting these chains
-have yet to converge. We can use the *[coda](https://CRAN.R-project.org/package=coda)* package to produce
+Chains 3, 5 and 6 are centred around an average of 153, with rapid
+back and forth oscillations. Chain 2 should be immediately discarded,
+since it has a large jump in the chain with clearly skewed
+histogram. The other two chains oscillate differently with contrasting
+quantiles to the 3 chains (3, 5 and 6) that agree with one another,
+suggesting these chains have yet to converge. We can use the
+*[coda](https://CRAN.R-project.org/package=coda)* package to produce
 summaries of our chains. Here is the `coda` summary for the third
 chain.
 
@@ -706,7 +708,7 @@ gelman.diag(meanoutProb[c(3, 5, 6)])
 Along with the Gelman diagnostic, which uses parallel chains, we can
 also apply a single chain analysis using the Geweke diagnostic [@Geweke:1992].  The
 Geweke diagnostic tests to see whether the mean calculated from the
-first $10\%$ of iterations is significantly different from the 
+first $10\%$ of iterations is significantly different from the
 mean calculated from the last $50\%$ of iterations.  If they are
 significantly different, at say a level 0.01, then this is evidence
 that particular chains have not converged. The following code chunk
@@ -744,26 +746,27 @@ with the remaining chains.
 
 
 ```{r}
-burne14Tagm <- mcmc_burn_chains(e14Tagm, 50)
-chains(burne14Tagm)
-chains(burne14Tagm)[[4]]
+burn_e14Tagm <- mcmc_burn_chains(e14Tagm, 50)
+chains(burn_e14Tagm)
+chains(burn_e14Tagm)[[4]]
 ```
 
 The following function recomputes the number of outliers in each chain
 at each iteration of each Markov-chain.
 
 ```{r}
-newout <- mcmc_get_outliers(burne14Tagm)
+out2 <- mcmc_get_outliers(burn_e14Tagm)
 ```
 
 The code chuck below computes the Geweke diagnostic for this new
 truncated chain and demonstrates that chain 4 has an improved Geweke
-diagnostic, whilst chain 2 does not. Thus, in practice, it maybe useful to
-remove iterations from the beginning of the chain. However, as chain 4 did not pass the
-Gelman diagnostics we still discard it from downstream analysis.
+diagnostic, whilst chain 2 does not. Thus, in practice, it maybe
+useful to remove iterations from the beginning of the chain. However,
+as chain 4 did not pass the Gelman diagnostics we still discard it
+from downstream analysis.
 
 ```{r gweketest}
-geweke_test(newout)
+geweke_test(out2)
 ```
 ## Processing converged chains
 
@@ -771,10 +774,9 @@ Having made an assessment of convergence, we decide to discard chains
 $1,2$ and $4$ from any further analysis. The code chunk below removes
 these chains and creates a new object to store the converged chains.
 
-```{r,}
+```{r}
 removeChain <- c(1, 2, 4) # The chains to be removed
 e14Tagm_converged <- e14Tagm[-removeChain] # Create new object
-
 ```
 
 The `MCMCParams` object can be large and therefore if we have a large
@@ -832,7 +834,6 @@ E14TG2aR <- tagmPredict(object = E14TG2aR,
                         params = e14Tagm_converged_pooled,
                         probJoint = TRUE)
 head(fData(E14TG2aR))
-
 ```
 
 ### Aside: *Priors* {-}
@@ -841,20 +842,21 @@ Bayesian analysis requires users to specify prior information about
 the parameters.  This may appear to be a challenging task; however,
 good default options are often possible. Should expert information be
 available for any of these priors then the users should provide this,
-otherwise we have found that the default choices work well in practice. The
-priors also provide regularisation and shrinkage to avoid
-overfitting. Given enough data the likelihood overwhelms the prior and
-the influence of the prior is weak.
+otherwise we have found that the default choices work well in
+practice. The priors also provide regularisation and shrinkage to
+avoid overfitting. Given enough data the likelihood overwhelms the
+prior and the influence of the prior is weak.
 
-We place a normal inverse-Wishart prior on the parameters of the mutivariate normal
-mixture components. The normal inverse-Wishart prior has $4$
-hyperparameters that must be specified. These are: the prior mean `mu0`
-expressing the prior location of each organelle; a prior shrinkage
-`lambda0`, which is a scalar expressing uncertainty in the prior mean; the prior
-degrees of freedom `nu0`; and a scale prior `S0` on the covariance.
-Together, `nu0` and `S0` specify the prior variability on organelle
-covariances.  The same prior distribution is assumed for the parameters of all mutivariate normal
-mixture components.
+We place a normal inverse-Wishart prior on the parameters of the
+mutivariate normal mixture components. The normal inverse-Wishart
+prior has $4$ hyperparameters that must be specified. These are: the
+prior mean `mu0` expressing the prior location of each organelle; a
+prior shrinkage `lambda0`, which is a scalar expressing uncertainty in
+the prior mean; the prior degrees of freedom `nu0`; and a scale prior
+`S0` on the covariance.  Together, `nu0` and `S0` specify the prior
+variability on organelle covariances.  The same prior distribution is
+assumed for the parameters of all mutivariate normal mixture
+components.
 
 The default options for these are based on the
 choice recommended by [@Fraley:2005]. The prior mean `mu0` is set to
@@ -982,7 +984,7 @@ because of its ability to provide richer information about the
 experimental results.  A fully Bayesian analysis differs from other
 machine learning approaches, since it can quantify the uncertainty in
 our inferences.  Furthermore, we use a generative model to explicitly
-describe the data, which makes inferences more interpretable compared to 
+describe the data, which makes inferences more interpretable compared to
 the less interpretable outputs of black-box classifiers such as, for
 example, support vector machines (SVM).
 
