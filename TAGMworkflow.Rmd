@@ -14,8 +14,8 @@ toc: FALSE
 
 # Abstract {-}
 
-A determinant step in deciphering a protein's function is finding out its
-subcellular localisation. The field of spatial proteomics has
+Knowledge of the subcellular location of a protein gives valuable insight into
+its function. The field of spatial proteomics has
 become increasingly popular due to improved multiplexing capabilities in
 high-throughput mass-spectrometry, which have made it possible to systematically localise
 thousands of proteins per experiment. In parallel with these experimental advances,
@@ -45,16 +45,17 @@ pRoloc::setStockcol(paste0(pRoloc::getStockcol(), 90))
 ```
 
 
-Quantifying uncertainty in the spatial subcellular distribution of
-proteins allows for novel insight into protein function
-[@Crook:2018]. Many proteins live in a single location within the
-cell, however there are those that reside in mutiple locations and
-those that dynamically relocalise [@Thul:2017]. These phenomena lead
+Determining the the spatial subcellular distribution of
+proteins enables novel insight into protein function
+[@Crook:2018]. Many proteins function within a single location within the
+cell, however it is estimated that up to half of the proteome is thought to
+reside in mutiple locations, with some of these undergoing
+dynamic relocalisation [@Thul:2017]. These phenomena lead
 to variability and uncertainty in robustly assigning proteins to a unique
 localisation. Functional
 compartmentalisation of proteins allows the cell to control
 biomolecular pathways and biochemical processes within the
-cell. Therefore, proteins with multiple localisation may have multiple
+cell. Therefore, proteins with multiple localisation may therefore have multiple
 functional roles [@Jeffery:2009]. Machine learning algorithms that
 fail to quantify uncertainty are unable to draw deeper insight into
 understanding cell biology from mass-spectrometry (MS) based spatial
@@ -63,7 +64,7 @@ make rigorous assessments of protein subcellular localisation
 and multi-localisation.
 
 For proteins to carry out their functional role they must be localised
-to the correct sub-cellular compartment, ensuring the biochemical conditions
+to the correct subcellular compartment, ensuring the biochemical conditions
 for desired molecular interactions are met [@Gibson:2009]. Many
 pathologies, including cancer and obesity are characterised by protein
 mis-localisations  [@Olkkonen:2006, @Laurila:2009, @Luheshi:2008, @De:2011,
@@ -92,14 +93,14 @@ Adopting a Bayesian framework for data analysis, though of much
 interest to experimentalists, can be challenging. Once we have
 specified a probabilistic model, computational approaches are typically used to obtain
 the posterior distribution upon observation of the data. These
-algorithms can have tuning parameters and a variety of settings, hindering
-their practical use by those not versed in Bayesian methodology. Even
+algorithms can have parameters that require tuning and a variety of settings, hindering
+their practical use by those not familiar with Bayesian methodology. Even
 once the algorithms have been correctly set-up, assessments of
 convergence and guidance on how to interpret the results are often
 sparse. This workflow presents a Bayesian analysis of spatial
-proteomics to elucidate the process for practitioners. We hope that
-our workflow may also provide a template for others interested in designing tools
-for the biological community which rely on Bayesian inference.
+proteomics to elucidate the process for practitioners. Our workflow also provides
+a template for others interested in designing tools for the biological community
+which rely on Bayesian inference.
 
 Our model for the data is the t-augmented Gaussian mixture (TAGM)
 model proposed in [@Crook:2018]. @Crook:2018 provide a detailed
@@ -108,7 +109,7 @@ spatial proteomics datasets, including a case study in which a hyperLOPIT
 experiment is performed on mouse pluripotent stem cells
 [@hyper;@Mulvey:2017]. Revisiting these details is not the purpose of
 this computational protocol; rather we present how to correctly use
-the software and provide step by step guidance for interpreting the
+the software and provide step-by-step guidance for interpreting the
 results.
 
 In brief, the TAGM model posits that each annotated sub-cellular niche
@@ -189,7 +190,7 @@ data("E14TG2aR") # load experimental data
 E14TG2aR
 ```
 
-On figure \@ref(fig:e14pca1) (left), we can visualise the mouse stem
+In figure \@ref(fig:e14pca1), we can visualise the mouse stem
 cell dataset use the `plot2D` function. We observe that some of the
 organelle classes overlap and this is a typical feature of biological
 datasets. Thus, it is vital to perform uncertainty quantification when
@@ -274,7 +275,7 @@ below plots the probability ellipses along the first and second, as
 well as the fourth principal component. The user can change the
 components visualised by altering the `dims` argument.
 
-```{r e14ellipse, fig.width = 10, fig.height = 5, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right)"}
+```{r e14ellipse, fig.width = 10, fig.height = 5, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right)."}
 par(mfrow = c(1, 2))
 plotEllipse(E14TG2aR, mappars)
 plotEllipse(E14TG2aR, mappars, dims = c(1, 4))
@@ -339,7 +340,7 @@ posterior localisation probabilities. To do this we extract the MAP
 localisation probabilities from the feature columns of the the
 `MSnSet` and pass these to the `plot2D` function (figure \@ref(fig:mappca)).
 
-```{r mappca, fig.height = 5, fig.width = 5, fig.cap = "TAGM MAP allocations"}
+```{r mappca, fig.height = 5, fig.width = 5, fig.cap = "TAGM MAP allocations, where the pointer is scaled according to the localisation probability and coloured according to the most probable subcellular niche."}
 ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
 plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6, fcol = "tagm.map.allocation")
@@ -363,8 +364,8 @@ advantage of taking a Bayesian approach and the biological information
 that can be extracted from this analysis.
 
 For those unfamiliar with Bayesian methodology,
-we explain some of the key ideas for a more complete
-understanding. Firstly, MCMC based inference contrasts with MAP based
+some of the key ideas for a more complete
+understanding are as follows. Firstly, MCMC based inference contrasts with MAP based
 inference in that it \textit{samples} from the posterior
 distribution of localisation probabilities. Hence, we do not just have
 a single estimate for each quantity but a distribution of
@@ -379,7 +380,7 @@ A schematic of MCMC sampling is provided in figure
 \@ref(fig:mcmcCartoon) to aid understanding. Proteins, coloured blue,
 are visualised along two variables of the data. Probability ellipses
 representing contours of a probability distribution matching the
-distribution of the proteins are overlayed. We now wish to obtain
+distribution of the proteins are overlaid. We now wish to obtain
 samples from this distribution. The MCMC algorithm is initialised with
 a starting location, then at each iteration a new value is
 proposed. These proposed values are either accepted or rejected
@@ -395,7 +396,7 @@ auto-correlation in the samples. To suppress this auto-correlation, we
 only retain every $r^{th}$ sample. This is known as thinning. The details of burn-in and
 thinning are further explained in later sections.
 
-```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling", message = FALSE, echo = FALSE, cache = FALSE}
+```{r mcmcCartoon, fig.width = 6, fig.height = 6, fig.cap = "A schematic figure of MCMC sampling. Proteins are coloured in blue and probability ellipses are overlaid representing contours of a probability distribution matching the distribution of the proteins. MCMC samples from the mean of this distribution are then coloured in red.", message = FALSE, echo = FALSE, cache = FALSE}
 set.seed(2)
 met <- pRoloc:::metropolisHastings(10000, 0.9)
 par(mfrow = c(2, 2),
@@ -614,7 +615,7 @@ variances. The ratio of these quantities should be close to one. A more detailed
 in the references. The *[coda](https://CRAN.R-project.org/package=coda)* package also
 reports the $95\%$ upper confidence interval of the $\hat{R}$
 statistic. In this case, our samples are approximately normally distributed (see
-traces on the right in figure \@ref(fig:mcmctraceHidden)).  The
+histograms on the right in figure \@ref(fig:mcmctraceHidden)).  The
 *[coda](https://CRAN.R-project.org/package=coda)* package allows for
 transformations to improve normality of the data, and in some cases we
 set the `transform` argument to apply log transformation.  @Gelman:1992
@@ -634,8 +635,8 @@ is 1.01 indicating that the MCMC algorithm for chains 3,5 and 6 might have conve
 
 We can also look at the Gelman diagnostics statistics for groups or
 pairs of chains. The first line below computes the Gelman diagnostic
-across the first three chains, whereas the second calculates between
-chain 3 and chain 5.
+across the first three chains, whereas the second calculates the diagnostic
+between chain 3 and chain 5.
 
 ```{r}
 gelman.diag(out[1:3], transform = FALSE) # the upper C.I is 1.62
@@ -650,13 +651,13 @@ before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2hidde
 meanAlloc <- mcmc_get_meanComponent(e14Tagm)
 ```
 
-```{r mcmctrace2hidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains.",echo=FALSE}
+```{r mcmctrace2hidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.",echo=FALSE}
 par(mfrow = c(6, 2))
 for (i in seq_len(nChains))
     plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation 6 MCMC chains.", eval = FALSE}
+```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.", eval = FALSE}
 for (i in seq_len(nChains))
     plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
@@ -721,7 +722,7 @@ geweke_test(meanoutProb)
 The first test suggests chain 2 has not converged, since the p-value is
 less than $10^{-10}$ suggesting that the mean in the first $10\%$ of
 iterations is significantly different from those in the final
-$50\%$. Moreover, the second test and third tests also suggest chain 2
+$50\%$. Moreover, the second test and third tests also suggest that chain 2
 has not converged. Furthermore, for the second test chain 4 has a marginally
 small p-value, providing further evidence that this chain is of low quality.  These
 convergence diagnostics are not limited to the quantities we have
@@ -729,17 +730,17 @@ computed here and further diagnostics can be performed on any summary of
 the data.
 
 An important question to consider is whether removing an early portion
-of the chain might lead to improvement of the convergence diagnostics.
+of the chain might lead to an improvement of the convergence diagnostics.
 This might be particularly relevant if a chain converges some
-iterations after our orginally specified `burnin`. For example let us
+iterations after our orginally specified `burn-in`. For example, let us
 take the second Geweke test above, which suggested chains 2 and 4 had not
 converged and see if discarding the initial $10\%$ of the chain
-improves the statistic. The function below removes $50$ samples ,
+improves the statistic. The function below removes $50$ samples,
 known as `burn-in`, from the beginning of each chain and the
 output shows that we now have $450$ samples in each chain. In practice,
 as $2$ chains are sufficient for good posterior estimates and convergence
 we could simply discard chains $2$ and $4$ and proceed with downstream analysis
-with the remaining $4$ chains.
+with the remaining chains.
 
 
 ```{r}
@@ -907,7 +908,7 @@ addLegend(E14TG2aR, fcol = "markers",
 ```
 
 We can visualise other summaries of the data including a Monte-Carlo
-averaged Shannon entropy, as show in figure \@ref(fig:mcmcpca) on the
+averaged Shannon entropy, as shown in figure \@ref(fig:mcmcpca) on the
 right. This is a measure of uncertainty and proteins with greater
 Shannon entropy have more uncertainty in their localisation. We
 observe global patterns of uncertainty, particularly in areas where
@@ -923,7 +924,7 @@ not only on localisation probability but also a measure of uncertainty,
 for example the Shannon entropy. Proteins with low Shannon entropy
 have low uncertainty in their localisation, whilst those with higher Shannon
 entropy have uncertain localisation. Since multi-localised protein have
-uncertain localisation to a single sub-cellular niche, exploring the Shannon
+uncertain localisation to a single subcellular niche, exploring the Shannon
 can aid in identifying multi-localised proteins.
 
 ```{r probvsentr, fig.width = 5, fig.height = 5, fig.cap = "Shannon entropy and localisation probability."}
@@ -1003,11 +1004,11 @@ output is a key barrier to their use. A Bayesian analysis usually consists of th
 broad steps: (1) Data pre-processing and algorithmic implementation,
 (2) assessing algorithmic  convergence and (3) summarising and visualising the results.
 This workflow provides a set of tools to simplify these steps and provides
-step by step guidance in the context of the analysis of spatial proteomics data.
+step-by-step guidance in the context of the analysis of spatial proteomics data.
 
 We have provided a workflow for the Bayesian analysis of spatial
 proteomics using the `pRoloc` and `MSnbase` software. We have
-demonstrated, in a step by step fashion, the challenges and advantages
+demonstrated, in a step-by-step fashion, the challenges and advantages
 associated with taking a Bayesian approach to data analysis. We hope this workflow
 will help spatial proteomics practitioners to apply our methods and
 will motivate others to create detailed documentation for the Bayesian
