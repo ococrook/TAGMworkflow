@@ -1,7 +1,7 @@
 ---
 title: "A Bioconductor workflow for the Bayesian analysis of spatial proteomics"
-author:
-- Oliver M. Crook, Lisa Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
+author: Oliver M. Crook, Lisa M. Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
+date: Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK  \nsplit MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK  \nsplit de Duve Institute, UCLouvain, Avenue Hippocrate 75, 1200 Brussels, Belgium
 package: pRoloc
 graphics: yes
 fig_caption: yes
