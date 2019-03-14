@@ -1,34 +1,35 @@
 ---
 title: "A Bioconductor workflow for the Bayesian analysis of spatial proteomics"
-author: Oliver M. Crook, Lisa M. Breckels, Kathryn S. Lilley, Paul D.W. Kirk, Laurent Gatto
-date: Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK  \nsplit MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK  \nsplit de Duve Institute, UCLouvain, Avenue Hippocrate 75, 1200 Brussels, Belgium
-package: pRoloc
-graphics: yes
-fig_caption: yes
+author:
+  - name: Oliver M. Crook
+    affiliation:
+    - Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK
+    - MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK
+  - name: Lisa M. Breckels
+    affiliation: Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK
+  - name: Kathryn S. Lilley
+    affiliation: Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK
+  - name: Paul D.W. Kirk
+    affiliation: MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK
+  - name: Laurent Gatto
+    affiliation: de Duve Institute, UCLouvain, Brussels, Belgium
+    email: laurent.gatto@uclouvain.be
+abstract: Knowledge of the subcellular location of a protein gives valuable insight into its function. The field of spatial proteomics has become increasingly popular due to improved multiplexing capabilities in high-throughput mass-spectrometry, which have made it possible to systematically localise thousands of proteins per experiment. In parallel with these experimental advances, improved methods for analysing spatial proteomics data have also been developed. In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of spatial proteomics data. We detail the software infrastructure and then provide step-by-step guidance of the analysis, including setting up a pipeline, assessing convergence, and interpreting downstream results. In several places we provide additional details on Bayesian analysis to provide users with a holistic view of Bayesian analysis for spatial proteomics data.
 bibliography: BayesProt.bib
-output: bookdown::pdf_document2
-toc: FALSE
+output: BiocWorkflowTools::f1000_article
 ---
 
 \newcommand{\diag}{\mathop{\mathrm{diag}}}
 
-# Abstract {-}
+**R version**: `r R.version.string`
 
-Knowledge of the subcellular location of a protein gives valuable insight into
-its function. The field of spatial proteomics has
-become increasingly popular due to improved multiplexing capabilities in
-high-throughput mass-spectrometry, which have made it possible to systematically localise
-thousands of proteins per experiment. In parallel with these experimental advances,
-improved methods for analysing spatial proteomics data have also been developed.
-In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of
-spatial proteomics data. We detail the software infrastructure and then provide
-step-by-step guidance of the analysis, including setting up a pipeline,
-assessing convergence, and interpreting downstream results. In several places
-we provide additional details on Bayesian analysis to provide users with a
-holistic view of Bayesian analysis for spatial proteomics data.
+**Bioconductor version**: `r BiocManager::version()`
 
+<!--  Update the name of the package below to be the name of the workflow package you are working on
+**Package**: `r packageVersion("base")` -->
 
 # Introduction
+
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
 stopifnot(packageVersion("pRoloc") >= '1.23.2')
@@ -67,16 +68,16 @@ For proteins to carry out their functional role they must be localised
 to the correct subcellular compartment, ensuring the biochemical conditions
 for desired molecular interactions are met [@Gibson:2009]. Many
 pathologies, including cancer and obesity are characterised by protein
-mis-localisations  [@Olkkonen:2006, @Laurila:2009, @Luheshi:2008, @De:2011,
-@Cody:2013, @Kau:2004, @Rodriguez:2004, @Latorre:2005, @Shin:2013, @Siljee:2018].
+mis-localisations  [@Olkkonen:2006; @Laurila:2009; @Luheshi:2008; @De:2011;
+@Cody:2013; @Kau:2004; @Rodriguez:2004; @Latorre:2005; @Shin:2013; @Siljee:2018].
 High-throughput spatial proteomics technologies have seen rapid improvement
 over the last decade and now a single experiment can provide spatial information on
-thousands of proteins at once [@Dunkley:2006, @Foster:2006, @hyper, @DC:2018].
+thousands of proteins at once [@Dunkley:2006; @Foster:2006; @hyper; @DC:2018].
 As a result of these spatial proteomics technologies many biological systems have
-been characterised [@Dunkley:2006, @Tan:2009, @Hall:2009, @Breckels:2013, @hyper, @Thul:2017].
+been characterised [@Dunkley:2006; @Tan:2009; @Hall:2009; @Breckels:2013; @hyper; @Thul:2017].
 The popularity of such methods is now evident with many new studies in recent years
-[@hyper, @Beltran:2016, @Jadot:2017, @Itzhak:2017, @Mendes:2017, @Hirst:2018,
-@Davies:2018, @Orre:2019, @Nightingale:2019].
+[@hyper; @Beltran:2016; @Jadot:2017; @Itzhak:2017; @Mendes:2017; @Hirst:2018;
+@Davies:2018; @Orre:2019; @Nightingale:2019].
 
 Bayesian approaches to machine learning and statistics can
 provide more insight, by providing uncertainty quantification
@@ -217,12 +218,10 @@ analysing biological data.
 <!-- ``` -->
 
 
-```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data.", fig.width = 5, fig.height = 5}
+```{r e14pca1, fig.cap = "First two principal components of mouse stem cell data.", out.width = '70%'}
 plot2D(E14TG2aR)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6)
 ```
-
-\newpage
 
 # Methods: *TAGM MAP*
 
@@ -275,7 +274,7 @@ below plots the probability ellipses along the first and second, as
 well as the fourth principal component. The user can change the
 components visualised by altering the `dims` argument.
 
-```{r e14ellipse, fig.width = 10, fig.height = 5, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right)."}
+```{r e14ellipse, out.width = '100%', fig.width = 10, fig.height = 5, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right)."}
 par(mfrow = c(1, 2))
 plotEllipse(E14TG2aR, mappars)
 plotEllipse(E14TG2aR, mappars, dims = c(1, 4))
@@ -297,7 +296,7 @@ parameter `numIter` in the `tagmMapTrain` method. In practice, it is not
 unexpected to observe small fluctuations due to numerical errors and
 this should not concern users.
 
-```{r mapconverge, fig.width = 6, fig.height = 4, fig.cap = "Log-posterior at each iteration of the EM algorithm demonstrating convergence."}
+```{r mapconverge, out.width = '80%', fig.width = 6, fig.height = 4, fig.cap = "Log-posterior at each iteration of the EM algorithm demonstrating convergence."}
 plot(logPosteriors(mappars), type = "b", col = "blue",
      cex = 0.3, ylab = "log-posterior", xlab = "iteration")
 ```
@@ -340,7 +339,7 @@ posterior localisation probabilities. To do this we extract the MAP
 localisation probabilities from the feature columns of the the
 `MSnSet` and pass these to the `plot2D` function (figure \@ref(fig:mappca)).
 
-```{r mappca, fig.height = 5, fig.width = 5, fig.cap = "TAGM MAP allocations, where the pointer is scaled according to the localisation probability and coloured according to the most probable subcellular niche."}
+```{r mappca, out.width = '70%', fig.cap = "TAGM MAP allocations, where the pointer is scaled according to the localisation probability and coloured according to the most probable subcellular niche."}
 ptsze <- fData(E14TG2aR)$tagm.map.probability # Scale pointer size
 plot2D(E14TG2aR, fcol = "tagm.map.allocation", cex = ptsze)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6, fcol = "tagm.map.allocation")
@@ -574,14 +573,14 @@ We can observe this from the trace plots and histograms for each MCMC
 chain (figure \@ref(fig:mcmctraceHidden)). Unconverged chains should be
 discarded from downstream analysis.
 
-```{r mcmctraceHidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", echo=FALSE}
+```{r mcmctraceHidden, out.width = '70%', fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", echo=FALSE}
 ## Using coda S3 objects to produce trace plots and histograms
 par(mfrow = c(6, 2))
 for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-```{r mcmctrace1, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", eval=FALSE}
+```{r mcmctrace1, out.width = '70%', fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the 6 MCMC chains.", eval=FALSE}
 ## Using coda S3 objects to produce trace plots and histograms
 for (i in seq_len(nChains))
     plot(out[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
@@ -653,13 +652,13 @@ before we produce trace plots of this quantity (figure \@ref(fig:mcmctrace2hidde
 meanAlloc <- mcmc_get_meanComponent(e14Tagm)
 ```
 
-```{r mcmctrace2hidden, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.",echo=FALSE}
+```{r mcmctrace2hidden, out.width = '70%', fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.", echo = FALSE}
 par(mfrow = c(6, 2))
 for (i in seq_len(nChains))
     plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
 
-```{r mcmctrace2, fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.", eval = FALSE}
+```{r mcmctrace2, out.width = '70%', fig.width=8, fig.height=15, fig.cap = "Trace (left) and density (right) of the mean component allocation of the 6 MCMC chains.", eval = FALSE}
 for (i in seq_len(nChains))
     plot(meanAlloc[[i]], main = paste("Chain", i), auto.layout = FALSE, col = i)
 ```
@@ -894,7 +893,7 @@ includes visualising the allocated organelle and localisation
 probability of each protein to its most probable organelle, as shown on
 figure \@ref(fig:mcmcpca).
 
-```{r mcmcpca, fig.height = 5, fig.width = 10, fig.cap = "TAGM MCMC allocations. On the left, point size have been scaled based on allocation probabilities. On the right, the point size have been scaled based on the global uncertainty using the mean Shannon entropy."}
+```{r mcmcpca, out.width = '100%', fig.height = 5, fig.width = 10, fig.cap = "TAGM MCMC allocations. On the left, point size have been scaled based on allocation probabilities. On the right, the point size have been scaled based on the global uncertainty using the mean Shannon entropy."}
 par(mfrow = c(1, 2))
 plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
        cex = fData(E14TG2aR)$tagm.mcmc.probability,
@@ -929,7 +928,7 @@ entropy have uncertain localisation. Since multi-localised protein have
 uncertain localisation to a single subcellular niche, exploring the Shannon
 can aid in identifying multi-localised proteins.
 
-```{r probvsentr, fig.width = 5, fig.height = 5, fig.cap = "Shannon entropy and localisation probability."}
+```{r probvsentr, out.width = '70%', fig.width = 5, fig.height = 5, fig.cap = "Shannon entropy and localisation probability."}
 cls <- getStockcol()[as.factor(fData(E14TG2aR)$tagm.mcmc.allocation)]
 plot(fData(E14TG2aR)$tagm.mcmc.probability,
      fData(E14TG2aR)$tagm.mcmc.mean.shannon,
@@ -1028,5 +1027,11 @@ sessionInfo()
 The source of this document, including the code necessary to reproduce
 the analyses and figures is available in a public manuscript
 repository on GitHub [@ghrepo].
+
+# Competing interests
+
+No competing interests were disclosed.
+
+# Grant information
 
 # References
