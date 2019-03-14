@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.6.18)  4 MAR 2019 14:13
+=======
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/Arch Linux) (preloaded format=pdflatex 2019.2.20)  4 MAR 2019 13:46
+>>>>>>> da25b3f0e66484514df80a866188192830156183
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -536,6 +540,22 @@ Package: titling 2009/09/04 v2.1d maketitle typesetting
 \thanksmarkwidth=\skip53
 \thanksmargin=\skip54
 \droptitle=\skip55
+<<<<<<< HEAD
+)
+! Undefined control sequence.
+<argument> ...of Cambridge, Cambridge, UK \nsplit 
+                                                  MRC Biostatistics Unit, Ca...
+l.130 ...ue Hippocrate 75, 1200 Brussels, Belgium}
+                                                   
+Here is how much of TeX's memory you used:
+ 11988 strings out of 493323
+ 169483 string characters out of 3139066
+ 276576 words of memory out of 3000000
+ 15441 multiletter control sequences out of 15000+200000
+ 4403 words of font info for 15 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 32i,0n,38p,239b,270s stack positions out of 5000i,500n,10000p,200000b,50000s
+=======
 ) (./TAGMworkflow.aux)
 \openout1 = `TAGMworkflow.aux'.
 
@@ -853,4 +873,6 @@ PDF statistics:
  448 compressed objects within 5 object streams
  125 named destinations out of 1000 (max. 500000)
  14539 words of extra memory for PDF output out of 17280 (max. 10000000)
+>>>>>>> da25b3f0e66484514df80a866188192830156183
 
+!  ==> Fatal error occurred, no output PDF file produced!
