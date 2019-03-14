@@ -1035,7 +1035,7 @@ No competing interests were disclosed.
 # Grant information
 
 PDWK was supported by the MRC (project reference MC_UU_00002/10). LMB
-was supported by a BSRC Tools and Resources Development grant (Award
+was supported by a BBSRC Tools and Resources Development grant (Award
 BB/N023129/1) and a Wellcome Trust Technology Development Grant (Grant
 number 108441/Z/15/Z). OMC is a Wellcome Trust Mathematical Genomics
 and Medicine student supported financially by the School of Clinical
