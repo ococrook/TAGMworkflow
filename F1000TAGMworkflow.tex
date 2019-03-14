@@ -489,7 +489,7 @@ The new feature variables that are generated are:
 
 \begin{verbatim}
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.3121  0.9693  0.9995  0.9465  1.0000  1.0000
+## 0.00000 0.06963 0.93943 0.63829 0.99934 1.00000
 \end{verbatim}
 
 \begin{itemize}
@@ -505,8 +505,8 @@ The new feature variables that are generated are:
 \end{Shaded}
 
 \begin{verbatim}
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##       0       0       0       0       0       0
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.0000000 0.0002363 0.0305487 0.3452624 0.9249810 1.0000000
 \end{verbatim}
 
 We can visualise the results by scaling the pointer according the
@@ -685,11 +685,11 @@ We can now access new variables:
 \begin{verbatim}
 ## 
 ##  Cytoskeleton            ER         Golgi      Lysosome mitochondrion 
-##            12            99            19            10            39 
+##            10            99            22             9            40 
 ##       Nucleus    Peroxisome            PM    Proteasome  Ribosome 40S 
-##            25             3            98            34            29 
+##            27             3           103            29            29 
 ##  Ribosome 60S 
-##            32
+##            29
 \end{verbatim}
 
 \begin{itemize}
@@ -706,7 +706,7 @@ We can now access new variables:
 
 \begin{verbatim}
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.2867  0.8986  0.9888  0.9088  1.0000  1.0000
+##  0.2809  0.9026  0.9902  0.9071  1.0000  1.0000
 \end{verbatim}
 
 We can also access other useful summaries of the MCMC methods:
@@ -1327,9 +1327,9 @@ argument.
 ## Q9JHU4          SKE      unknown unknown   Nucleus - Chromatin
 ## Q9QXS1      unknown      unknown unknown       Plasma membrane
 ##        tagm.map.probability tagm.map.outlier  tagm.mcmc.allocation
-## Q62261            0.5710958                0 Endoplasmic reticulum
-## Q9JHU4            1.0000000                0   Nucleus - Chromatin
-## Q9QXS1            0.9999997                0            Proteasome
+## Q62261         8.165817e-09     0.9999999857 Endoplasmic reticulum
+## Q9JHU4         9.996798e-01     0.0003202255   Nucleus - Chromatin
+## Q9QXS1         1.250898e-06     0.9999987491            Proteasome
 ##        tagm.mcmc.probability tagm.mcmc.probability.lowerquantile
 ## Q62261             0.5765793                        0.0020296117
 ## Q9JHU4             0.9738206                        0.7594516090
@@ -1607,10 +1607,10 @@ generate this document.
 ## other attached packages:
 ##  [1] patchwork_0.0.1      pRolocdata_1.21.1    pRoloc_1.23.2       
 ##  [4] coda_0.19-2          mixtools_1.1.0       BiocParallel_1.16.6 
-##  [7] MLInterfaces_1.62.0  cluster_2.0.7-1      annotate_1.60.0     
-## [10] XML_3.98-1.18        AnnotationDbi_1.44.0 IRanges_2.16.0      
+##  [7] MLInterfaces_1.62.0  cluster_2.0.7-1      annotate_1.60.1     
+## [10] XML_3.98-1.19        AnnotationDbi_1.44.0 IRanges_2.16.0      
 ## [13] MSnbase_2.9.3        ProtGenerics_1.14.0  S4Vectors_0.20.1    
-## [16] mzR_2.16.1           Rcpp_1.0.0           Biobase_2.42.0      
+## [16] mzR_2.17.2           Rcpp_1.0.0           Biobase_2.42.0      
 ## [19] BiocGenerics_0.28.0 
 ## 
 ## loaded via a namespace (and not attached):
@@ -1620,7 +1620,7 @@ generate this document.
 ##   [7] rda_1.0.2-2.1           devtools_2.0.1         
 ##   [9] munsell_0.5.0           codetools_0.2-16       
 ##  [11] preprocessCore_1.44.0   withr_2.1.2            
-##  [13] colorspace_1.4-0        knitr_1.21             
+##  [13] colorspace_1.4-0        knitr_1.22             
 ##  [15] rstudioapi_0.9.0        robustbase_0.93-3      
 ##  [17] mzID_1.20.1             labeling_0.3           
 ##  [19] git2r_0.24.0            hwriter_1.3.2          
@@ -1633,7 +1633,7 @@ generate this document.
 ##  [33] assertthat_0.2.0        promises_1.0.1         
 ##  [35] scales_1.0.0            nnet_7.3-12            
 ##  [37] gtable_0.2.0            affy_1.60.0            
-##  [39] processx_3.2.1          timeDate_3043.102      
+##  [39] processx_3.3.0          timeDate_3043.102      
 ##  [41] rlang_0.3.1             genefilter_1.64.0      
 ##  [43] splines_3.5.2           lazyeval_0.2.1         
 ##  [45] ModelMetrics_1.2.2      impute_1.56.0          
@@ -1645,7 +1645,7 @@ generate this document.
 ##  [57] lava_1.6.5              usethis_1.4.0          
 ##  [59] bookdown_0.9            ggplot2_3.1.0          
 ##  [61] affyio_1.52.0           RColorBrewer_1.1-2     
-##  [63] proxy_0.4-22            sessioninfo_1.1.1      
+##  [63] proxy_0.4-23            sessioninfo_1.1.1      
 ##  [65] plyr_1.8.4              base64enc_0.1-3        
 ##  [67] progress_1.2.0          zlibbioc_1.28.0        
 ##  [69] purrr_0.3.1             RCurl_1.95-4.12        
@@ -1654,14 +1654,14 @@ generate this document.
 ##  [75] sampling_2.8            sfsmisc_1.1-3          
 ##  [77] LaplacesDemon_16.1.1    fs_1.2.6               
 ##  [79] magrittr_1.5            data.table_1.12.0      
-##  [81] pcaMethods_1.74.0       mvtnorm_1.0-9          
+##  [81] pcaMethods_1.74.0       mvtnorm_1.0-10         
 ##  [83] whisker_0.3-2           pkgload_1.0.2          
 ##  [85] hms_0.4.2               mime_0.6               
 ##  [87] evaluate_0.13           xtable_1.8-3           
 ##  [89] mclust_5.4.2            gridExtra_2.3          
 ##  [91] testthat_2.0.1          compiler_3.5.2         
 ##  [93] biomaRt_2.38.0          tibble_2.0.1           
-##  [95] ncdf4_1.16              crayon_1.3.4           
+##  [95] ncdf4_1.16.1            crayon_1.3.4           
 ##  [97] htmltools_0.3.6         segmented_0.5-3.0      
 ##  [99] later_0.8.0             BiocWorkflowTools_1.8.0
 ##  [ reached getOption("max.print") -- omitted 49 entries ]
