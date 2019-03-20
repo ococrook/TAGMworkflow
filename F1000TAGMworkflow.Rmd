@@ -1032,6 +1032,12 @@ repository on GitHub [@ghrepo].
 
 No competing interests were disclosed.
 
+# Underlying data
+
+The data used in this workflow was first published in Breckels *et
+al.* (2016) [@Breckels:2016] and is available in the `pRolocdata`
+package.
+
 # Grant information
 
 PDWK was supported by the MRC (project reference MC_UU_00002/10). LMB
