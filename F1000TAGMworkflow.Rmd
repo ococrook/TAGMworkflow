@@ -14,7 +14,7 @@ author:
   - name: Laurent Gatto
     affiliation: de Duve Institute, UCLouvain, Brussels, Belgium
     email: laurent.gatto@uclouvain.be
-abstract: Knowledge of the subcellular location of a protein gives valuable insight into its function. The field of spatial proteomics has become increasingly popular due to improved multiplexing capabilities in high-throughput mass-spectrometry, which have made it possible to systematically localise thousands of proteins per experiment. In parallel with these experimental advances, improved methods for analysing spatial proteomics data have also been developed. In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of spatial proteomics data. We detail the software infrastructure and then provide step-by-step guidance of the analysis, including setting up a pipeline, assessing convergence, and interpreting downstream results. In several places we provide additional details on Bayesian analysis to provide users with a holistic view of Bayesian analysis for spatial proteomics data.
+abstract: Knowledge of the subcellular location of a protein gives valuable insight into its function. The field of spatial proteomics has become increasingly popular due to improved multiplexing capabilities in high-throughput mass spectrometry, which have made it possible to systematically localise thousands of proteins per experiment. In parallel with these experimental advances, improved methods for analysing spatial proteomics data have also been developed. In this workflow, we demonstrate using `pRoloc` for the Bayesian analysis of spatial proteomics data. We detail the software infrastructure and then provide step-by-step guidance of the analysis, including setting up a pipeline, assessing convergence, and interpreting downstream results. In several places we provide additional details on Bayesian analysis to provide users with a holistic view of Bayesian analysis for spatial proteomics data.
 bibliography: BayesProt.bib
 output: BiocWorkflowTools::f1000_article
 ---
@@ -49,17 +49,17 @@ pRoloc::setStockcol(paste0(pRoloc::getStockcol(), 90))
 Determining the the spatial subcellular distribution of
 proteins enables novel insight into protein function
 [@Crook:2018]. Many proteins function within a single location within the
-cell, however it is estimated that up to half of the proteome is thought to
-reside in mutiple locations, with some of these undergoing
+cell; however, it is estimated that up to half of the proteome is thought to
+reside in multiple locations, with some of these undergoing
 dynamic relocalisation [@Thul:2017]. These phenomena lead
 to variability and uncertainty in robustly assigning proteins to a unique
 localisation. Functional
 compartmentalisation of proteins allows the cell to control
 biomolecular pathways and biochemical processes within the
-cell. Therefore, proteins with multiple localisation may therefore have multiple
+cell. Therefore, proteins with multiple localisations may have multiple
 functional roles [@Jeffery:2009]. Machine learning algorithms that
 fail to quantify uncertainty are unable to draw deeper insight into
-understanding cell biology from mass-spectrometry (MS) based spatial
+understanding cell biology from mass spectrometry (MS)-based spatial
 proteomics experiments. Hence, quantifying uncertainty allows us to
 make rigorous assessments of protein subcellular localisation
 and multi-localisation.
@@ -138,13 +138,16 @@ This workflow begins with a brief review of some of the basic features
 of mass spectrometry-based spatial proteomics data, including our
 state-of-the-art computational infrastructure and bespoke software
 suite.  We then present each method in turn, detailing how to obtain
-high quality results. We provide an extended discussion of the
-TAGM MCMC method to highlight some of the challenges that may arise
-when applying this method. This includes how to assess convergence of
-MCMC methods, as well as methods for manipulating the output. We then
-take the processed output and explain how to interpret the results, as
-well as providing some tools for visualisation. We conclude with some
-remarks and directions for the future.
+high quality results. We provide an extended discussion of the TAGM
+MCMC method to highlight some of the challenges that may arise when
+applying this method. This includes how to assess convergence of MCMC
+methods, as well as methods for manipulating the output. We then take
+the processed output and explain how to interpret the results, as well
+as providing some tools for visualisation. We conclude with some
+remarks and directions for the future. Source code for this workflow,
+including code used to generate tables and figures, is available on
+[GitHub](https://github.com/ococrook/TAGMworkflow)
+[@oliver_m_crook_2019_2593712]
 
 # Getting started and infrastructure
 
@@ -1028,15 +1031,22 @@ The source of this document, including the code necessary to reproduce
 the analyses and figures is available in a public manuscript
 repository on GitHub [@ghrepo].
 
-# Competing interests
-
-No competing interests were disclosed.
-
-# Underlying data
+# Data availability
 
 The data used in this workflow was first published in Breckels *et
-al.* (2016) [@Breckels:2016] and is available in the `pRolocdata`
+al.* (2016) [@Breckels:2016] and is available in the
+[pRolocdata](https://bioconductor.org/packages/release/data/experiment/html/pRolocdata.html)
 package.
+
+# Software availability
+
+Computational workflow for this study available from:
+https://github.com/ococrook/TAGMworkflow
+
+Archived source code at time of publication:
+https://doi.org/10.5281/zenodo.2593712 [@oliver_m_crook_2019_2593712]
+
+License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode)
 
 # Grant information
 
@@ -1045,9 +1055,11 @@ was supported by a BBSRC Tools and Resources Development grant (Award
 BB/N023129/1) and a Wellcome Trust Technology Development Grant (Grant
 number 108441/Z/15/Z). OMC is a Wellcome Trust Mathematical Genomics
 and Medicine student supported financially by the School of Clinical
-Medicine, University of Cambridge. The funders had no role in study
+Medicine, University of Cambridge.
+
+*The funders had no role in study
 design, data collection and analysis, decision to publish, or
-preparation of the manuscript.
+preparation of the manuscript.*
 
 
 # References
