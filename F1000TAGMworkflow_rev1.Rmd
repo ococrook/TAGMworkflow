@@ -244,7 +244,7 @@ analysing biological data.
 <!-- ``` -->
 
 
-```{r e14pca1, fig.cap = "The first two principal component of a mouse embryonic stem cell dataset [@Breckels:2016]. Each pointer represents a protein and marker proteins are coloured according to their localisation. Proteins with unknown localisation are coloured grey.", out.width = '70%'}
+```{r e14pca1, fig.cap = "The first two principal component of a mouse embryonic stem cell dataset [@Breckels:2016]. Each pointer represents a protein and marker proteins are coloured according to their localisation. Proteins with unknown localisation are coloured grey.", out.width = '80%'}
 plot2D(E14TG2aR)
 addLegend(E14TG2aR, where = "topleft", cex = 0.6)
 ```
@@ -300,8 +300,8 @@ below plots the probability ellipses along the first and second, as
 well as the fourth principal component. The user can change the
 components visualised by altering the `dims` argument.
 
-```{r e14ellipse, out.width = '100%', fig.width = 10, fig.height = 8, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right). The ellipses show the component-conditional densities obtained from the fitted model evaluated at $\theta_{\text{MAP}}$"}
-par(mfrow = c(2, 1))
+```{r e14ellipse, out.width = '100%', fig.width = 10, fig.height = 6, fig.cap = "PCA plot with probability ellipses along PC 1 and 2 (left) and PC 1 and 4 (right). The ellipses show the component-conditional densities obtained from the fitted model evaluated at $\theta_{\text{MAP}}$"}
+layout(matrix(c(1,1,1,1,2,2), nrow = 6, ncol = 1, byrow = TRUE))
 plotEllipse(E14TG2aR, mappars)
 plotEllipse(E14TG2aR, mappars, dims = c(1, 4))
 ```
@@ -334,7 +334,7 @@ appended to the `fData` columns of the `MSnSet`.
 
 
 ```{r tagmPredict, cache = TRUE}
-E14TG2aR <- tagmPredict(E14TG2aR, mappars) # Predict protein localisation
+E14TG2aR <- tagmPredict(E14TG2aR, mappars, probJoint = TRUE) # Predict protein localisation
 ```
 
 The new feature variables that are generated are:
@@ -934,7 +934,7 @@ a given parameter from the data [@Betancourt:2018]. Values of the posterior
 shrinkage close to $1$ suggest that the parameter values are strongly informed
 by the data.
 
-```{r, out.width = '70%', fig.width=10, fig.height=5, fig.cap="Scatter plot of the posterior Shrinkage against the posterior z-score for the mixing proportions of the model"}
+```{r, out.width = '70%', fig.width=10, fig.height=5, fig.cap="Scatter plot of the posterior shrinkage against the posterior z-score for the mixing proportions of the model"}
 mixing_posterior_check(object = E14TG2aR, params = e14Tagm_converged_pooled[[1]], priors = e14Tagm@priors)
 ```
 
@@ -999,6 +999,11 @@ allocated to each niche.
 prior_simulation <- colMeans(gtools::rdirichlet(n = 10000, alpha = beta_informed) * N)
 names(prior_simulation) <- getMarkerClasses(E14TG2aR)
 prior_simulation
+```
+
+```{r priorpredict, out.width = '100%', fig.height = 4, fig.width = 4, fig.cap = "A barplot showing the expected (prior) number of proteins allocated to each niche "}
+par(mar = c(11.5, 6.5, 0.5, 0.5), mgp = c(10, 1, 0))
+barplot(prior_simulation, las = 2, col = "darkgreen", xlab = "sub-cellular niche", ylab = "prior expected number of allocations")
 ```
 
 It is clear that this prior captures the information that the mitochondrion
@@ -1074,8 +1079,8 @@ includes visualising the allocated organelle and localisation
 probability of each protein to its most probable organelle, as shown on
 figure \@ref(fig:mcmcpca).
 
-```{r mcmcpca, out.width = '100%', fig.height = 5, fig.width = 10, fig.cap = "TAGM MCMC allocations. On the left, point size have been scaled based on allocation probabilities. On the right, the point size have been scaled based on the global uncertainty using the mean Shannon entropy."}
-par(mfrow = c(1, 2))
+```{r mcmcpca, out.width = '100%', fig.height = 8, fig.width = 6, fig.cap = "TAGM MCMC allocations. In the upper plot, pointer sizes have been scaled based on allocation probabilities. On the lower plot, the pointer sizes have been scaled based on the global uncertainty using the mean Shannon entropy."}
+layout(matrix(c(1,1,2,2), nrow = 4, ncol = 1, byrow = TRUE))
 plot2D(E14TG2aR, fcol = "tagm.mcmc.allocation",
        cex = fData(E14TG2aR)$tagm.mcmc.probability,
        main = "TAGM MCMC allocations")
@@ -1273,7 +1278,7 @@ License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode)
 
 PDWK was supported by the MRC (project reference MC_UU_00002/10). LMB
 <<<<<<< HEAD
-was supported by a BSRC Tools and Resources Development grant (Award
+was supported by a BBSRC Tools and Resources Development grant (Award
 BB/N023129/1) and a Wellcome Trust Technology Development Grant (Grant
 number 108441/Z/15/Z). OMC is a Wellcome Trust Mathematical Genomics
 and Medicine student supported financially by the School of Clinical
