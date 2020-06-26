@@ -10,7 +10,9 @@ author:
   - name: Kathryn S. Lilley
     affiliation: Cambridge Centre for Proteomics, Department of Biochemistry, University of Cambridge, Cambridge, UK
   - name: Paul D.W. Kirk
-    affiliation: MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK
+    affiliation: 
+    - MRC Biostatistics Unit, Cambridge Institute for Public Health, Cambridge, UK
+    - Cambridge Institute of Therapeutic Immunology & Infectious Disease (CITIID), Jeffrey Cheah Biomedical Centre, Cambridge Biomedical Campus, University of Cambridge, U.K.
   - name: Laurent Gatto
     affiliation: de Duve Institute, UCLouvain, Brussels, Belgium
     email: laurent.gatto@uclouvain.be
@@ -1276,7 +1278,7 @@ License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode)
 
 # Grant information
 
-PDWK was supported by the MRC (project reference MC_UU_00002/10). LMB
+PDWK was supported by the MRC (project reference MC_UU_00002/10 and MC_UU_00002/13). LMB
 <<<<<<< HEAD
 was supported by a BBSRC Tools and Resources Development grant (Award
 BB/N023129/1) and a Wellcome Trust Technology Development Grant (Grant
